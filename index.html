@@ -534,8 +534,8 @@
       <form id="addTokenForm">
         <label>Mata Pelajaran</label>
         <input type="text" id="addSubject" placeholder="Gunakan kapital" required />
-        <label>Kelas</label>
-        <input type="text" id="addKelas" placeholder="Berupa angka saja (7)" required />
+        <label>Kelas (7, 8, atau 9)</label>
+        <input type="text" id="addKelas" placeholder="Berupa angka saja" required />
         <label>Token Ujian (Base Token)</label>
         <input type="text" id="addToken" placeholder="Berupa huruf/angka (gunakan kapital)" required />
         
@@ -572,8 +572,8 @@
       <form id="modalForm">
         <label>Mata Pelajaran</label>
         <input type="text" id="editSubject" required />
-        <label>Kelas</label>
-        <input type="text" id="editKelas" placeholder="Berupa angka saja (7)" required />
+        <label>Kelas (7, 8, atau 9)</label>
+        <input type="text" id="editKelas" placeholder="Berupa angka saja" required />
         <label>Token Ujian</label>
         <input type="text" id="editToken" required />
         
@@ -614,7 +614,7 @@
               <label for="newStudentName">Nama Siswa</label>
               <input type="text" id="newStudentName" placeholder="Nama Lengkap Siswa" required />
               <label for="newStudentClass">Kelas</label>
-              <input type="text" id="newStudentClass" placeholder="Contoh: 7A, 7B, 7C" required />
+              <input type="text" id="newStudentClass" placeholder="Contoh: 7A, 8B, 9C" required />
               <label for="newStudentRoom">Ruang</label>
               <input type="text" id="newStudentRoom" placeholder="Contoh: 01, 02, dsb" required />
               <button type="submit">Tambah Peserta</button>
@@ -652,24 +652,12 @@
     import { getDatabase, ref, push, onValue, update, remove, runTransaction, get } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js";
 
     const allFirebaseConfigs = {
-        '7ABC': { 
-            apiKey: "AIzaSyBJBl_HWsOsnBBI1EPs1yQlJd0Hso8HcSo", 
-            authDomain: "ujianpdf-7abc.firebaseapp.com", 
-            databaseURL: "https://ujianpdf-7abc-default-rtdb.firebaseio.com",
-            projectId: "ujianpdf-7abc", 
-            storageBucket: "ujianpdf-7abc.firebasestorage.app", 
-            messagingSenderId: "1035978389542", 
-            appId: "1:1035978389542:web:413eb32b04c0d09bc48ee7" 
-        },
-        '7DEF': { 
-            apiKey: "AIzaSyDQKdbwaG0Tg7_tfHs0hCbNR3xlqT3vWLA", 
-            authDomain: "ujianpdf-7def.firebaseapp.com", 
-            databaseURL: "https://ujianpdf-7def-default-rtdb.firebaseio.com",
-            projectId: "ujianpdf-7def", 
-            storageBucket: "ujianpdf-7def.firebasestorage.app", 
-            messagingSenderId: "210211262444", 
-            appId: "1:210211262444:web:a06a988913ede65369bac9" 
-        }
+        '7ABC': { apiKey: "AIzaSyBJBl_HWsOsnBBI1EPs1yQlJd0Hso8HcSo", authDomain: "ujianpdf-7abc.firebaseapp.com", databaseURL: "https://ujianpdf-7abc-default-rtdb.firebaseio.com", projectId: "ujianpdf-7abc", storageBucket: "ujianpdf-7abc.appspot.com", messagingSenderId: "1035978389542", appId: "1:1035978389542:web:413eb32b04c0d09bc48ee7" },
+        '7DEF': { apiKey: "AIzaSyDQKdbwaG0Tg7_tfHs0hCbNR3xlqT3vWLA", authDomain: "ujianpdf-7def.firebaseapp.com", databaseURL: "https://ujianpdf-7def-default-rtdb.firebaseio.com", projectId: "ujianpdf-7def", storageBucket: "ujianpdf-7def.appspot.com", messagingSenderId: "210211262444", appId: "1:210211262444:web:a06a988913ede65369bac9" },
+        '8ABC': { apiKey: "AIzaSyAsbVn2qVIgH278ZjPfkMihlGYmyL8zJFA", authDomain: "ujianpdf8abc-3bedf.firebaseapp.com", databaseURL: "https://ujianpdf8abc-3bedf-default-rtdb.firebaseio.com", projectId: "ujianpdf8abc-3bedf", storageBucket: "ujianpdf8abc-3bedf.appspot.com", messagingSenderId: "408487358048", appId: "1:408487358048:web:10cc8796510f4b8ab99d05" },
+        '8DEF': { apiKey: "AIzaSyBvkIMTkJkDqe2nKspIMXOCeT9vc6h8xjA", authDomain: "ujianpdf8def-9bdcd.firebaseapp.com", databaseURL: "https://ujianpdf8def-9bdcd-default-rtdb.firebaseio.com", projectId: "ujianpdf8def-9bdcd", storageBucket: "ujianpdf8def-9bdcd.appspot.com", messagingSenderId: "69381651529", appId: "1:69381651529:web:af517e87735d2ad51a9398" },
+        '9ABC': { apiKey: "AIzaSyCjf42a3CCB3IuNto2K8MGpTX_SM1FXyrw", authDomain: "ujianpdf-9abc.firebaseapp.com", databaseURL: "https://ujianpdf-9abc-default-rtdb.firebaseio.com", projectId: "ujianpdf-9abc", storageBucket: "ujianpdf-9abc.appspot.com", messagingSenderId: "939178637981", appId: "1:939178637981:web:b9a15dfa72180d15d77274" },
+        '9DEF': { apiKey: "AIzaSyDK50Amn6N8gl_q6CVhDjV_DRPpdCpCTrw", authDomain: "ujianpdf-9def.firebaseapp.com", databaseURL: "https://ujianpdf-9def-default-rtdb.firebaseio.com", projectId: "ujianpdf-9def", storageBucket: "ujianpdf-9def.appspot.com", messagingSenderId: "450883192159", appId: "1:450883192159:web:6ad39c42db5756ff0f62ea" }
     };
     
     const dbInstances = {};
@@ -681,14 +669,23 @@
         }
     }
     
-    const gradeToDbGroupMap = { '7': ['7ABC', '7DEF'] };
-    const rombelToDbMap = { '7A': '7ABC', '7B': '7ABC', '7C': '7ABC', '7D': '7DEF', '7E': '7DEF', '7F': '7DEF' };
+    const gradeToDbGroupMap = {
+        '7': ['7ABC', '7DEF'],
+        '8': ['8ABC', '8DEF'],
+        '9': ['9ABC', '9DEF']
+    };
+
+    const rombelToDbMap = {
+        '7A': '7ABC', '7B': '7ABC', '7C': '7ABC', '7D': '7DEF', '7E': '7DEF', '7F': '7DEF',
+        '8A': '8ABC', '8B': '8ABC', '8C': '8ABC', '8D': '8DEF', '8E': '8DEF', '8F': '8DEF',
+        '9A': '9ABC', '9B': '9ABC', '9C': '9ABC', '9D': '9DEF', '9E': '9DEF', '9F': '9DEF'
+    };
 
     const ADMIN_USER = "admin";
     const ADMIN_PASS = "12345678";
     const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000;
     const INACTIVITY_TIMEOUT = 60 * 60 * 1000;
-    const VALID_ROMBELS = ['7A', '7B', '7C', '7D', '7E', '7F'];
+    const VALID_ROMBELS = Object.keys(rombelToDbMap);
     const defaultLocationCoordinate = "-7.8589546,110.2655596";
     
     let inactivityTimer;
@@ -1074,7 +1071,7 @@
       document.getElementById('addGoogleDriveUrlError').innerText = "";
       document.getElementById('addAnswerKeyError').innerText = "";
 
-      if (!['7'].includes(k)) return em.innerText = "Kelas harus berupa 7.";
+      if (!['7', '8', '9'].includes(k)) return em.innerText = "Kelas harus berupa 7, 8, atau 9.";
       const targetDbs = getDbForClass(k);
       if (!targetDbs || !Array.isArray(targetDbs) || targetDbs.length === 0) return em.innerText = "Kelas tidak valid atau konfigurasi Firebase belum lengkap.";
       if (!s || !k || !t || !originalGoogleDriveUrl || !answerKey || !startTimeInput || !endTimeInput) return em.innerText = "Semua field harus diisi!";
@@ -1087,7 +1084,7 @@
       if (tokenCache.some(item => item.token === t && getNumericClass(item.kelas) === getNumericClass(k))) return em.innerText = "Token (Base Token) sudah ada untuk kelas ini!";
 
       loadingOverlay.style.display = 'flex';
-      const adjustedStartTime = new Date(originalStartTime.getTime() + (k === '7' ? 30000 : 0)); 
+      const adjustedStartTime = new Date(originalStartTime.getTime() + 30000); 
       const durationMinutes = Math.round((originalEndTime.getTime() - adjustedStartTime.getTime()) / 60000);
       const data = { subject: s, kelas: k, token: t, googleDriveUrl: googleDriveUrlPreview, originalGoogleDriveUrl, answerKey, startTime: formatLocalDateTime(adjustedStartTime), endTime: endTimeInput, durationMinutes, createdAt: Date.now(), isActive: false, isForceActive: false };
 
@@ -1133,7 +1130,7 @@
       const em = document.getElementById('editErrorMsg');
       em.innerText = ""; document.getElementById('editGoogleDriveUrlError').innerText = ""; document.getElementById('editAnswerKeyError').innerText = "";
 
-      if (!['7'].includes(newKelas)) return em.innerText = "Kelas harus berupa 7.";
+      if (!['7', '8', '9'].includes(newKelas)) return em.innerText = "Kelas harus berupa 7, 8, atau 9.";
       if (!currentConsolidatedTokenInfo) return em.innerText = "Error: Informasi token tidak ditemukan.";
       
       const oldKelas = currentConsolidatedTokenInfo.kelas;
@@ -1150,7 +1147,7 @@
       if (Array.from(consolidatedTokensMap.values()).some(item => item.token === t && item.kelas === newKelas && !(item.token === oldBaseToken && item.kelas === oldKelas))) return em.innerText = "Token (Base Token) sudah ada untuk kelas ini!";
 
       loadingOverlay.style.display = 'flex';
-      const adjustedStartTime = new Date(originalStartTime.getTime() + (newKelas === '7' ? 30000 : 0));
+      const adjustedStartTime = new Date(originalStartTime.getTime() + 30000);
       const durationMinutes = Math.round((originalEndTime.getTime() - adjustedStartTime.getTime()) / 60000);
       const updatedData = { subject: s, kelas: newKelas, token: t, googleDriveUrl: googleDriveUrlPreview, originalGoogleDriveUrl, answerKey, startTime: formatLocalDateTime(adjustedStartTime), endTime: endTimeInput, durationMinutes, createdAt: currentConsolidatedTokenInfo.createdAt, isForceActive: currentConsolidatedTokenInfo.isForceActive, isActive: currentConsolidatedTokenInfo.isActive };
 
@@ -1307,7 +1304,7 @@
         const studentErrorMsg = document.getElementById('addStudentErrorMsg');
         studentErrorMsg.innerText = "";
         
-        if (!VALID_ROMBELS.includes(studentClass)) return studentErrorMsg.innerText = "Kelas siswa tidak valid. Gunakan format seperti 7A, 7B, dll.";
+        if (!VALID_ROMBELS.includes(studentClass)) return studentErrorMsg.innerText = "Kelas siswa tidak valid. Gunakan format seperti 7A, 8B, 9C, dll.";
         const targetDb = getDbForClass(studentClass);
         if (!targetDb || Array.isArray(targetDb)) return studentErrorMsg.innerText = "Konfigurasi Firebase belum lengkap untuk rombel ini.";
         if (!/^\d{3,}$/.test(studentId)) return studentErrorMsg.innerText = "ID Siswa harus berupa angka!";
@@ -1499,7 +1496,8 @@
             const text = e.target.result;
             const lines = text.split('\n').filter(line => line.trim() !== '');
             let importedCount = 0, skippedCount = 0, errorDetails = [];
-            const batchUpdateMap = { '7ABC': {}, '7DEF': {} };
+            const batchUpdateMap = {};
+            Object.keys(dbInstances).forEach(name => batchUpdateMap[name] = {});
 
             for (let i = 1; i < lines.length; i++) {
                 const parts = lines[i].split(',').map(p => p.trim());
@@ -1629,11 +1627,6 @@
         }
         return parseFloat(((correctCount / totalQuestions) * 100).toFixed(2));
     }
-
-    function filterScoresByGrade(grade) { 
-        document.getElementById('filterClass7').classList.toggle('active');
-        renderScoreTable(); 
-    };
 
     window.promptResetStudent = (key, id, name, studentClass) => {
         studentKeyForAction = key; studentIdForAction = id; studentNameForAction = name; studentClassForAction = studentClass;
