@@ -15,6 +15,9 @@
       display: flex;
       min-height: 100vh;
       overflow-x: hidden;
+      flex-direction: column; /* Changed to column for better login page centering */
+      align-items: center; /* Center horizontally */
+      justify-content: center; /* Center vertically */
     }
     .sidebar {
       width: 80px;
@@ -46,6 +49,7 @@
       overflow-y: auto;
       height: 100vh;
       box-sizing: border-box;
+      width: 100%; /* Ensure main content takes full width when active */
     }
     .container {
       background: white;
@@ -150,7 +154,7 @@
       display: inline-flex; align-items: center; gap: 8px;
       text-align: center; white-space: nowrap;
     }
-    .text-button:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+    .text-button:hover { background-color: #455a64; transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
     .text-button:active { transform: translateY(0); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
     .text-button.blue-gray { background-color: #607d8b; color: white; }
     .text-button.blue-gray:hover { background-color: #455a64; }
@@ -207,14 +211,36 @@
     #tokenTableBody td, #studentTableBody td, #scoreTableBody td {
         white-space: nowrap;
     }
-    #tokenTableBody td:nth-child(2), /* MAPEL & KELAS */
-    #tokenTableBody td:nth-child(5) { /* PROGRES */
-        white-space: normal;
+    /* New styles for token table */
+    #tokenTableBody td.mapel-cell {
+        /* Remove nowrap and ellipsis for the cell, apply to content within */
+        white-space: normal; /* Allow content to wrap */
+        overflow: visible; /* Ensure content is visible */
+        text-overflow: clip; /* No ellipsis on the cell itself */
+        max-width: 180px; /* Adjust as needed */
     }
-    #tokenTableBody td:nth-child(4) { /* WAKTU UJIAN */
+    #tokenTableBody td.mapel-cell .subject-display {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%; /* Ensure it respects parent width */
+        display: block; /* Make it a block element to control its own line */
+        font-weight: bold;
+    }
+    /* Removed .class-display as per request */
+    #tokenTableBody td.mapel-cell .link-display {
+        display: block; /* Force link to new line */
+        font-size: 0.85em;
+        margin-top: 5px; /* Add some spacing */
+    }
+
+    #tokenTableBody td.time-cell,
+    #tokenTableBody td.duration-cell {
         text-align: center;
-        white-space: normal;
+        white-space: nowrap;
     }
+    /* End new styles */
+
     #scoreTableBody td:nth-child(2) { /* NAMA SISWA */
         white-space: normal;
     }
@@ -290,9 +316,28 @@
     .login-link { color: #3498db; text-decoration: underline; font-weight: bold; transition: color 0.3s ease; }
     .login-link:hover { color: #2980b9; cursor: pointer; }
     .login-link:active { color: #e74c3c; }
-    .controls-header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 20px; }
-    .actions-group, .filters-group { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-    .filters-group input, .filters-group select { margin: 0; }
+    .controls-header {
+      display: flex;
+      flex-wrap: wrap; /* Allows items to wrap on smaller screens */
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px; /* Spacing between groups */
+      margin-bottom: 20px;
+    }
+    .actions-group, .filters-group {
+      display: flex;
+      flex-wrap: wrap; /* Allows inner items to wrap */
+      gap: 10px; /* Spacing between individual filters/buttons */
+      align-items: center;
+    }
+    /* Adjust input and select widths within filters-group */
+    .filters-group input,
+    .filters-group select {
+      margin: 0;
+      flex-grow: 1; /* Allow them to grow */
+      min-width: 120px; /* Minimum width before wrapping */
+      max-width: 180px; /* Max width for consistency */
+    }
     .filters-group label { margin-right: 5px; font-weight: 500; }
     .answer-key-input-group { display: flex; gap: 10px; align-items: flex-end; margin: 8px 0; }
     .answer-key-input-group > div { display: flex; flex-direction: column; }
@@ -300,6 +345,46 @@
     .answer-key-input-group input { margin: 0; height: auto; }
     .answer-key-input-group .count-input { flex-shrink: 0; width: 80px; text-align: center; background-color: #e9ecef; cursor: default; }
     .answer-key-input-group .key-input { flex-grow: 1; }
+
+    /* Pagination styles */
+    .pagination-controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin-top: 20px;
+        flex-wrap: wrap; /* Allow wrapping on small screens */
+    }
+
+    .pagination-controls button {
+        padding: 8px 15px;
+        margin: 0; /* Override default button margin */
+        font-size: 14px;
+        border-radius: 5px;
+        background-color: #3498db;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.2s ease, transform 0.1s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .pagination-controls button:hover:not(:disabled) {
+        background-color: #2980b9;
+        transform: translateY(-1px);
+    }
+
+    .pagination-controls button:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+        box-shadow: none;
+    }
+
+    .pagination-controls span {
+        font-size: 15px;
+        font-weight: bold;
+        color: #2c3e50;
+    }
     
     /* Responsive styles */
     @media (max-width: 768px) {
@@ -328,6 +413,13 @@
       .sidebar-nav button span { display: none; }
       .sidebar-nav button { padding: 10px; }
       .controls-header { justify-content: center; }
+      .pagination-controls {
+          flex-direction: column;
+          gap: 5px;
+      }
+      .pagination-controls button {
+          width: 80%; /* Make buttons wider on small screens */
+      }
     }
   </style>
 </head>
@@ -363,7 +455,7 @@
   <!-- Main Content Area -->
   <div class="main-content" id="mainContent">
     <!-- Login Section -->
-    <div class="container" id="loginSection">
+    <div class="container" id="loginSection" style="max-width: 400px; margin: auto;"> <!-- Added inline style for centering on load -->
       <h3 style="text-align: center; color: #2c3e50;">LOGIN ADMINISTRASI</h3>
       <p id="loginError" class="error"></p>
       <input type="text" id="username" placeholder="Username" />
@@ -390,6 +482,7 @@
                     <i class="fas fa-plus"></i> Tambah Token
                 </button>
                 <button class="text-button gray" onclick="openCopyPrintModal('tokenTable', 'Cetak Daftar Token')"><i class="fas fa-print"></i> Cetak</button>
+                <button class="text-button red" onclick="promptEmptyTokens()"><i class="fas fa-trash-alt"></i> Kosongkan</button>
             </div>
             <div class="filters-group">
                  <input type="text" id="tokenSearchSubject" placeholder="Cari Mapel..." />
@@ -403,9 +496,12 @@
             <thead>
               <tr>
                 <th>NO</th>
-                <th>MAPEL & KELAS</th>
+                <th>MAPEL</th>
+                <th>KELAS</th>
                 <th>TOKEN</th>
-                <th style="text-align: center;">WAKTU UJIAN</th>
+                <th class="time-cell">DIBUKA</th>
+                <th class="time-cell">DITUTUP</th>
+                <th class="duration-cell">DURASI</th>
                 <th style="text-align: center;">PROGRES</th>
                 <th>AKSI</th>
               </tr>
@@ -472,12 +568,29 @@
             </div>
         </div>
         <div class="controls-header">
-            <div class="filters-group" style="flex-grow: 1; justify-content: flex-end;">
+            <!-- Filter group adjusted for better layout -->
+            <div class="filters-group" style="flex-grow: 1; justify-content: flex-start; align-items: flex-end; width: 100%;">
                 <input type="text" id="studentSearchId" placeholder="Cari ID..." style="max-width: 150px;"/>
                 <input type="text" id="studentSearchName" placeholder="Cari Nama..." style="max-width: 200px;" />
                 <input type="text" id="studentSearchClass" placeholder="Cari Kelas..." style="max-width: 150px;" />
                 <select id="examStatusFilter">
-                    <option value="">Semua Status</option>
+                    <option value="">PILIH TOKEN UJIAN</option>
+                </select>
+                <select id="studentOverallStatusFilter" onchange="window.renderStudentTable(1)">
+                    <option value="ALL" selected>SEMUA STATUS</option> <!-- Default to SEMUA STATUS -->
+                    <option value="Sudah submit">Sudah Submit</option>
+                    <option value="Sedang mengerjakan">Sedang Mengerjakan</option>
+                    <option value="Belum login (reset)">Belum Login (Reset)</option>
+                    <option value="Belum login">Belum Login</option>
+                </select>
+                <select id="itemsPerPageSelect" onchange="window.updateItemsPerPage(this.value)">
+                    <option value="25">25 per halaman</option>
+                    <option value="50">50 per halaman</option>
+                    <option value="75" selected>75 per halaman</option>
+                    <option value="100">100 per halaman</option>
+                    <option value="200">200 per halaman</option>
+                    <option value="500">500 per halaman</option>
+                    <option value="1000">1000 per halaman</option>
                 </select>
             </div>
         </div>
@@ -497,6 +610,7 @@
               <tbody id="studentTableBody"></tbody>
             </table>
         </div>
+        <div id="studentPagination" class="pagination-controls"></div>
       </div>
 
       <!-- Score Section -->
@@ -504,6 +618,9 @@
         <h1 id="scoreSectionTitle" style="text-align: left; margin-bottom: 20px; color: #34495e;">Daftar Nilai Ujian</h1>
         <div class="controls-header">
             <div class="actions-group">
+                <button class="text-button light-blue" onclick="window.currentScoreGradeFilter = '7'; window.renderScoreTable(1);"><i class="fas fa-graduation-cap"></i> Kelas 7</button>
+                <button class="text-button light-blue" onclick="window.currentScoreGradeFilter = '8'; window.renderScoreTable(1);"><i class="fas fa-graduation-cap"></i> Kelas 8</button>
+                <button class="text-button light-blue" onclick="window.currentScoreGradeFilter = '9'; window.renderScoreTable(1);"><i class="fas fa-graduation-cap"></i> Kelas 9</button>
                 <button class="text-button gray" onclick="openCopyPrintModal('scoreTable', 'Cetak Daftar Nilai')"><i class="fas fa-print"></i> Cetak</button>
             </div>
             <div class="filters-group">
@@ -523,6 +640,7 @@
             <tbody id="scoreTableBody"></tbody>
           </table>
         </div>
+        <div id="scorePagination" class="pagination-controls"></div>
       </div>
       </div>
   </div>
@@ -639,12 +757,27 @@
   <div id="deleteStudentConfirmModal" class="modal"><div class="modal-content"><p>Yakin ingin menghapus siswa ini?</p><button onclick="confirmDeleteStudent()" class="confirm-button">Hapus</button><button onclick="closeDeleteStudentConfirmModal()" class="cancel-button">Batal</button></div></div>
   <div id="importStudentModal" class="modal"><div class="modal-content"><h4>Import Data Peserta dari CSV</h4><p style="font-size: 0.9em; color: #555; text-align: left;">Perhatikan hal-hal berikut!<br>1. Siapkan data peserta dengan 4 kolom: ID Peserta (angka), Nama Lengkap, Kelas, dan Ruang<br>2. Simpan file dengan format *.csv (comma delimited)<br>3. Pastikan tidak ada kolom tambahan</p><a href="https://drive.google.com/uc?export=download&id=16rzsLjQ3AVm0wIPqWnzsauzbrwGfO7An" target="_blank" style="display: block; text-align: center; margin: 15px 0; padding: 10px 20px; background-color: #28a745; color: white; text-decoration: none; border-radius: 5px;">Unduh Template CSV</a> <input type="file" id="csvFileInput" accept=".csv" style="margin-top: 15px; margin-bottom: 10px;" /><p id="importFileError" class="error"></p><button onclick="processCsvFile()">Mulai Impor</button><button onclick="closeImportStudentModal()" class="cancel-button">Batal</button></div></div>
   <div id="importResultModal" class="modal"><div class="modal-content"><h4>Hasil Impor Data Siswa</h4><p id="importResultSummary"></p><ul id="importResultDetails" style="text-align: left; max-height: 200px; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 5px;"></ul><button onclick="closeImportResultModal()">Tutup</button></div></div>
-  <div id="emptyStudentsModal" class="modal"><div class="modal-content"><h4>Kosongkan Daftar Peserta</h4><p>Anda yakin ingin menghapus <b>SEMUA</b> data peserta? Tindakan ini tidak dapat dibatalkan.</p><div><label for="emptyStudentsPassword">Password Admin:</label><input type="password" id="emptyStudentsPassword"><p id="emptyStudentsPasswordError" class="error"></p></div><button onclick="confirmEmptyStudents()" class="confirm-button">Konfirmasi Hapus Semua</button><button onclick="closeEmptyStudentsModal()" class="cancel-button">Batal</button></div></div>
+  <div id="emptyStudentsModal" class="modal"><div class="modal-content"><h4>Kosongkan Daftar Peserta</h4><p>Anda yakin ingin menghapus <b>SEMUA</b> data peserta? Tindakan ini tidak dapat dibatalkan.</p><div><label for="emptyStudentsPassword">Password Admin:</label><input type="password" id="emptyStudentsPassword"><p id="emptyStudentsPasswordError" class="error"></p></div><button onclick="closeEmptyStudentsModal()" class="cancel-button">Batal</button><button onclick="confirmEmptyStudents()" class="confirm-button">Konfirmasi Hapus Semua</button></div></div>
   <div id="logoutConfirmModal" class="modal"><div class="modal-content"><h4>Konfirmasi Logout</h4><p>Anda yakin ingin keluar dari panel admin?</p><button onclick="confirmLogout()" class="confirm-button">Ya, Keluar</button><button onclick="closeLogoutModal()" class="cancel-button">Batal</button></div></div>
-  <div id="resetStudentModal" class="modal"><div class="modal-content"><h4>Reset Status Login Siswa</h4><p>Anda yakin ingin mereset status login siswa <b id="resetStudentNameDisplay"></b> (ID: <b id="resetStudentIdDisplay"></b>)?</p><p style="font-size: 0.9em; color: #555;">Ini akan memaksa siswa untuk login ulang jika mereka sedang dalam sesi.</p><button onclick="confirmResetStudent()" class="confirm-button">Reset</button><button onclick="closeResetStudentModal()" class="cancel-button">Batal</button></div></div>
-  <div id="submitAnswerModal" class="modal"><div class="modal-content"><h4>Kirim Jawaban Siswa (Manual)</h4><p>Anda yakin ingin menandai semua ujian yang sedang dikerjakan siswa <b id="submitStudentNameDisplay"></b> (ID: <b id="submitStudentIdDisplay"></b>) sebagai 'Sudah submit'?</p><p style="font-size: 0.9em; color: #555;">Tindakan ini akan mengunci jawaban siswa untuk ujian yang relevan.</p><button onclick="confirmSubmitAnswer()" class="confirm-button">Kirim Jawaban</button><button onclick="closeSubmitAnswerModal()" class="cancel-button">Batal</button></div></div>
-  <div id="deleteAnswerModal" class="modal"><div class="modal-content"><h4>Hapus Semua Jawaban Siswa</h4><p>Anda yakin ingin menghapus <b>SEMUA</b> jawaban dan status submit untuk siswa <b id="deleteAnswerStudentNameDisplay"></b> (ID: <b id="deleteAnswerStudentIdDisplay"></b>)?</p><p style="font-size: 0.9em; color: #e74c3c; font-weight: bold;">Tindakan ini tidak dapat dibatalkan!</p><div><label for="deleteAnswerPassword">Password Admin:</label><input type="password" id="deleteAnswerPassword"><p id="deleteAnswerPasswordError" class="error"></p></div><button onclick="confirmDeleteAnswer()" class="confirm-button">Hapus Jawaban</button><button onclick="closeDeleteAnswerModal()" class="cancel-button">Batal</button></div></div>
+  <div id="resetStudentModal" class="modal"><div class="modal-content"><h4>Reset Status Login Siswa</h4><p>Anda yakin ingin mereset status login siswa <b id="resetStudentNameDisplay"></b> (ID: <b id="resetStudentIdDisplay"></b>)?</p><p style="font-size: 0.9em; color: #555;">Ini akan memaksa siswa untuk login ulang jika mereka sedang dalam sesi.</p><button onclick="closeResetStudentModal()" class="cancel-button">Batal</button><button onclick="confirmResetStudent()" class="confirm-button">Reset</button></div></div>
+  <div id="submitAnswerModal" class="modal"><div class="modal-content"><h4>Kirim Jawaban Siswa (Manual)</h4><p>Anda yakin ingin menandai semua ujian yang sedang dikerjakan siswa <b id="submitStudentNameDisplay"></b> (ID: <b id="submitStudentIdDisplay"></b>) sebagai 'Sudah submit'?</p><p style="font-size: 0.9em; color: #555;">Tindakan ini akan mengunci jawaban siswa untuk ujian yang relevan.</p><button onclick="closeSubmitAnswerModal()" class="cancel-button">Batal</button><button onclick="confirmSubmitAnswer()" class="confirm-button">Kirim Jawaban</button></div></div>
+  <div id="deleteAnswerModal" class="modal"><div class="modal-content"><h4>Hapus Semua Jawaban Siswa</h4><p>Anda yakin ingin menghapus <b>SEMUA</b> jawaban dan status submit untuk siswa <b id="deleteAnswerStudentNameDisplay"></b> (ID: <b id="deleteAnswerStudentIdDisplay"></b>)?</p><p style="font-size: 0.9em; color: #e74c3c; font-weight: bold;">Tindakan ini tidak dapat dibatalkan!</p><div><label for="deleteAnswerPassword">Password Admin:</label><input type="password" id="deleteAnswerPassword"><p id="deleteAnswerPasswordError" class="error"></p></div><button onclick="closeDeleteAnswerModal()" class="cancel-button">Batal</button><button onclick="confirmDeleteAnswer()" class="confirm-button">Hapus Jawaban</button></div></div>
   <div id="loadingOverlay" class="loading-overlay" style="display: none;"><div class="spinner"></div></div>
+  
+  <!-- New Modal for Empty Tokens Confirmation -->
+  <div id="emptyTokensModal" class="modal">
+      <div class="modal-content">
+          <h4>Kosongkan Semua Token?</h4>
+          <p>Anda yakin ingin menghapus <b>SEMUA</b> token dan data terkait (akses, submit, jawaban siswa)? Tindakan ini tidak dapat dibatalkan.</p>
+          <div>
+              <label for="emptyTokensPassword">Password Admin:</label>
+              <input type="password" id="emptyTokensPassword">
+              <p id="emptyTokensPasswordError" class="error"></p>
+          </div>
+          <button onclick="closeEmptyTokensModal()" class="cancel-button">Batal</button>
+          <button onclick="confirmEmptyTokens()" class="confirm-button">Konfirmasi Hapus Semua</button>
+      </div>
+  </div>
 
   <!-- JavaScript Module -->
   <script type="module">
@@ -707,6 +840,14 @@
     let studentNameForAction = null;
     let studentClassForAction = null;
     let currentTableIdToCopy = '';
+
+    // Pagination variables
+    let selectedItemsPerPage = 75; // Default value, will be updated by dropdown
+    let currentPageStudent = 1;
+    let currentPageScore = 1;
+    let filteredStudents = [];
+    let filteredScores = [];
+    window.currentScoreGradeFilter = 'ALL'; // Made global, default filter for score table
     
     let isLocationEnabledAdmin = false;
     let allowedRadiusMeterAdmin = 75;
@@ -723,10 +864,15 @@
     const tokenTableBody = document.getElementById('tokenTableBody');
     const studentTableBody = document.getElementById('studentTableBody');
     const examStatusFilterDropdown = document.getElementById('examStatusFilter');
+    const studentOverallStatusFilter = document.getElementById('studentOverallStatusFilter'); // New filter
+    const itemsPerPageSelect = document.getElementById('itemsPerPageSelect'); // Get reference to the select element
     const scoreTableHeader = document.getElementById('scoreTableHeader');
     const scoreTableBody = document.getElementById('scoreTableBody');
     const locationSettingsTableBody = document.getElementById('locationSettingsTableBody');
     const lockSettingsTableBody = document.getElementById('lockSettingsTableBody');
+    const studentPaginationDiv = document.getElementById('studentPagination');
+    const scorePaginationDiv = document.getElementById('scorePagination');
+
 
     const padStudentId = (id) => String(id).padStart(3, '0');
     const padRoomNumber = (room) => {
@@ -734,6 +880,7 @@
         const numRoom = parseInt(room, 10);
         return !isNaN(numRoom) ? String(numRoom).padStart(2, '0') : String(room).toUpperCase();
     };
+    // Helper function to format date and time for display
     const formatLocalDateTime = (date) => {
         const year = date.getFullYear();
         const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -741,6 +888,12 @@
         const hours = date.getHours().toString().padStart(2, '0');
         const minutes = date.getMinutes().toString().padStart(2, '0');
         return `${year}-${month}-${day}T${hours}:${minutes}`;
+    };
+    // Helper function to format date for display in tables
+    const formatDisplayTime = (dateTimeString) => {
+        if (!dateTimeString) return '-';
+        const date = new Date(dateTimeString);
+        return date.toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' });
     };
     const getNumericClass = (classString) => String(classString || '').match(/^(\d+)/)?.[1] || null;
     const getDbForClass = (classIdentifier) => {
@@ -754,7 +907,7 @@
         console.error(`Instance database tidak ditemukan untuk identifier: ${classIdentifier}`);
         return null;
     };
-    const escapeHtmlAttributeForJsString = (s) => String(s).replace(/&/g, '&amp;').replace(/'/g, '&#39;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const escapeHtmlAttributeForJsString = (s) => (s === undefined || s === null ? '' : String(s)).replace(/&/g, '&amp;').replace(/'/g, '&#39;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); // Modified here
     const convertToPreviewLink = (url) => (!url || typeof url !== 'string') ? url : url.replace(/\/view(\?usp=sharing)?$/, '/preview');
     const showNotification = (message) => {
         const n = document.getElementById('notification');
@@ -764,9 +917,16 @@
     };
 
     function initializeAppState() {
+        // Hide login, show dashboard
         loginSection.style.display = 'none';
         sidebar.style.display = 'flex';
         dashboardContent.style.display = 'flex';
+        // Reset body display to default for dashboard layout
+        document.body.style.display = 'flex';
+        document.body.style.flexDirection = 'row'; // Assuming default dashboard is row layout
+        document.body.style.alignItems = 'flex-start';
+        document.body.style.justifyContent = 'flex-start';
+
         loadTokens();
         loadStudents();
         loadTokenAccessStatus();
@@ -793,12 +953,14 @@
     function attachEventListeners() {
         // Search/Filter Listeners
         document.getElementById('tokenSearchSubject').addEventListener('keyup', renderTokenTable);
-        document.getElementById('scoreSearchName').addEventListener('keyup', renderScoreTable);
-        document.getElementById('scoreSearchClass').addEventListener('keyup', renderScoreTable);
-        document.getElementById('studentSearchId').addEventListener('keyup', renderStudentTable);
-        document.getElementById('studentSearchName').addEventListener('keyup', renderStudentTable);
-        document.getElementById('studentSearchClass').addEventListener('keyup', renderStudentTable);
-        document.getElementById('examStatusFilter').addEventListener('change', renderStudentTable);
+        document.getElementById('scoreSearchName').addEventListener('keyup', () => window.renderScoreTable(1)); // Reset to page 1 on search
+        document.getElementById('scoreSearchClass').addEventListener('keyup', () => window.renderScoreTable(1)); // Reset to page 1 on search
+        document.getElementById('studentSearchId').addEventListener('keyup', () => window.renderStudentTable(1)); // Reset to page 1 on search
+        document.getElementById('studentSearchName').addEventListener('keyup', () => window.renderStudentTable(1)); // Reset to page 1 on search
+        document.getElementById('studentSearchClass').addEventListener('keyup', () => window.renderStudentTable(1)); // Reset to page 1 on search
+        document.getElementById('examStatusFilter').addEventListener('change', () => window.renderStudentTable(1)); // Reset to page 1 on filter
+        // studentOverallStatusFilter has its onchange handler in HTML
+        // itemsPerPageSelect has its onchange handler in HTML
 
         // Form Listeners
         document.getElementById('addTokenForm').addEventListener('submit', handleAddToken);
@@ -817,7 +979,11 @@
           loginSection.style.display = 'block';
           sidebar.style.display = 'none';
           dashboardContent.style.display = 'none';
-          collapseSidebar();
+          // Ensure body is centered for login page initially
+          document.body.style.display = 'flex';
+          document.body.style.flexDirection = 'column';
+          document.body.style.alignItems = 'center';
+          document.body.style.justifyContent = 'center';
       }
       attachEventListeners();
     });
@@ -836,8 +1002,15 @@
         
         if (sectionId === 'tokenSection') renderTokenTable();
         else if (sectionId === 'rulesSection') { updateSetlokasiStatusDisplay(); renderLockSettingsTable(); }
-        else if (sectionId === 'studentSection') { populateExamStatusFilter(); renderStudentTable(); }
-        else if (sectionId === 'scoreSection') renderScoreTable();
+        else if (sectionId === 'studentSection') { 
+            // Set status filter to "Pilih Status Ujian" on initial section load
+            studentOverallStatusFilter.value = 'ALL'; // Set to "ALL" value
+            window.renderStudentTable(1); // Always start at page 1 for student section
+        } 
+        else if (sectionId === 'scoreSection') {
+            window.currentScoreGradeFilter = 'ALL'; // Reset score grade filter to show all grades
+            window.renderScoreTable(1); // Always start at page 1 for score section
+        }
     };
 
     window.handleMenuClick = (buttonElement) => {
@@ -922,13 +1095,9 @@
                 </div>`;
 
             // Time and Duration Display
-            const startTimeFormatted = data.startTime ? new Date(data.startTime).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) : '-';
-            const endTimeFormatted = data.endTime ? new Date(data.endTime).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) : '-';
-            const waktuUjianHtml = `<small>Buka: ${startTimeFormatted}<br>Tutup: ${endTimeFormatted}<br>Durasi: ${data.durationMinutes ?? '-'} menit</small>`;
-            
-            // Mapel & Kelas Display
-            const mapelKelasHtml = `<b>${escapeHtmlAttributeForJsString(data.subject)}</b><br>
-                                  <small>Kls: ${escapeHtmlAttributeForJsString(data.kelas)} / <a href="${escapeHtmlAttributeForJsString(data.googleDriveUrl)}" target="_blank" class="login-link">Link Soal</a></small>`;
+            const startTimeFormatted = formatDisplayTime(data.startTime);
+            const endTimeFormatted = formatDisplayTime(data.endTime);
+            const durationDisplay = data.durationMinutes ? `${data.durationMinutes} menit` : '-';
             
             // Token Status Toggle
             const isCurrentlyActive = data.isForceActive || data.isActive;
@@ -939,9 +1108,15 @@
             
             row.innerHTML = `
                 <td>${index + 1}</td>
-                <td>${mapelKelasHtml}</td>
+                <td class="mapel-cell">
+                    <div class="subject-display">${escapeHtmlAttributeForJsString(data.subject)}</div>
+                    <a href="${escapeHtmlAttributeForJsString(data.googleDriveUrl)}" target="_blank" class="login-link link-display">Link Soal</a>
+                </td>
+                <td>${escapeHtmlAttributeForJsString(data.kelas)}</td>
                 <td>${tokenDisplayHtml}</td>
-                <td>${waktuUjianHtml}</td>
+                <td class="time-cell">${startTimeFormatted}</td>
+                <td class="time-cell">${endTimeFormatted}</td>
+                <td class="duration-cell">${durationDisplay}</td>
                 <td>${progresHtml}</td>
                 <td>
                     <div class="action-buttons-group">
@@ -1140,16 +1315,16 @@
       if (!s || !newKelas || !t || !originalGoogleDriveUrl || !answerKey || !startTimeInput || !endTimeInput) return em.innerText = "Semua field harus diisi!";
 
       const originalStartTime = new Date(startTimeInput);
-      const originalEndTime = new Date(endTimeInput);
+      const originalEndTime = new Date(new Date(endTimeInput).getTime() + 30000); // Add 30 seconds for end time
       if (originalStartTime >= originalEndTime) return em.innerText = "Waktu token dibuka harus sebelum waktu token ditutup!";
       if (!/^[A-D](,[A-D])*$/.test(answerKey) && answerKey) return document.getElementById('editAnswerKeyError').innerText = "Format kunci jawaban tidak valid.";
       if (!originalGoogleDriveUrl.startsWith('http')) return document.getElementById('editGoogleDriveUrlError').innerText = "URL Google Drive tidak valid.";
       if (Array.from(consolidatedTokensMap.values()).some(item => item.token === t && item.kelas === newKelas && !(item.token === oldBaseToken && item.kelas === oldKelas))) return em.innerText = "Token (Base Token) sudah ada untuk kelas ini!";
 
       loadingOverlay.style.display = 'flex';
-      const adjustedStartTime = new Date(originalStartTime.getTime() + 30000);
+      const adjustedStartTime = new Date(originalStartTime.getTime()); // No need to adjust start time by 30 seconds
       const durationMinutes = Math.round((originalEndTime.getTime() - adjustedStartTime.getTime()) / 60000);
-      const updatedData = { subject: s, kelas: newKelas, token: t, googleDriveUrl: googleDriveUrlPreview, originalGoogleDriveUrl, answerKey, startTime: formatLocalDateTime(adjustedStartTime), endTime: endTimeInput, durationMinutes, createdAt: currentConsolidatedTokenInfo.createdAt, isForceActive: currentConsolidatedTokenInfo.isForceActive, isActive: currentConsolidatedTokenInfo.isActive };
+      const updatedStudentData = { subject: s, kelas: newKelas, token: t, googleDriveUrl: googleDriveUrlPreview, originalGoogleDriveUrl, answerKey, startTime: formatLocalDateTime(adjustedStartTime), endTime: formatLocalDateTime(originalEndTime), durationMinutes, createdAt: currentConsolidatedTokenInfo.createdAt, isForceActive: currentConsolidatedTokenInfo.isForceActive, isActive: currentConsolidatedTokenInfo.isActive }; // Changed variable name to updatedStudentData
 
       try {
           if (getNumericClass(oldKelas) !== getNumericClass(newKelas) || oldBaseToken !== t) {
@@ -1160,13 +1335,13 @@
               });
               await Promise.all(deletePromises);
               const newTargetDbs = getDbForClass(newKelas);
-              await Promise.all(newTargetDbs.map(db => push(ref(db, 'tokens'), updatedData)));
+              await Promise.all(newTargetDbs.map(db => push(ref(db, 'tokens'), updatedStudentData))); // Changed variable name to updatedStudentData
               showNotification(`Token berhasil dipindahkan ke kelas ${newKelas}!`);
           } else {
               const updatePromises = oldFirebaseKeys.map(fbKey => {
                   const token = tokenCache.find(tok => tok.key === fbKey);
                   const db = token ? dbInstances[token.firebaseGroup] : null;
-                  return db ? update(ref(db, `tokens/${fbKey}`), updatedData) : Promise.resolve();
+                  return db ? update(ref(db, `tokens/${fbKey}`), updatedStudentData) : Promise.resolve(); // Changed variable name to updatedStudentData
               });
               await Promise.all(updatePromises);
               showNotification('Token berhasil diedit!');
@@ -1177,7 +1352,7 @@
       } finally {
           loadingOverlay.style.display = 'none';
           currentConsolidatedTokenInfo = null;
-      }
+        }
     }
 
     window.promptDeleteConsolidated = (baseToken, kelas) => {
@@ -1215,51 +1390,110 @@
                 onValue(ref(dbInstance, 'students'), (snapshot) => {
                     const groupStudents = [];
                     snapshot.forEach(child => {
-                        const data = child.val(); data.key = child.key; data.firebaseGroup = dbName; groupStudents.push(data);
+                          const data = child.val();
+                          // Ensure data is valid before pushing, and has a key
+                          if (data && child.key) {
+                            data.key = child.key;
+                            data.firebaseGroup = dbName;
+                            // Ensure core properties are strings, replace undefined/null with empty string
+                            data.id = String(data.id || '');
+                            data.name = String(data.name || '');
+                            data.class = String(data.class || '');
+                            data.room = String(data.room || ''); // room can be optional, padRoomNumber handles empty string
+                            groupStudents.push(data);
+                          } else {
+                            console.warn("Skipping malformed student data:", child.val(), "from db:", dbName);
+                          }
                     });
-                    studentCache = studentCache.filter(s => s.firebaseGroup !== dbName);
-                    studentCache.push(...groupStudents);
+                    studentCache = studentCache.filter(s => s.firebaseGroup !== dbName).concat(groupStudents);
                     studentCache.sort((a, b) => {
-                        const classA = String(a.class || ''), classB = String(b.class || '');
+                        const classA = String(a.class || '').toLowerCase(), classB = String(b.class || '').toLowerCase();
                         if(classA !== classB) return classA.localeCompare(classB);
-                        return String(a.name || '').localeCompare(String(b.name || ''));
+                        const nameA = String(a.name || '').toLowerCase(), nameB = String(b.name || '').toLowerCase();
+                        return nameA.localeCompare(nameB);
                     });
-                    renderStudentTable();
-                    renderScoreTable();
+                    window.renderStudentTable(currentPageStudent); // Re-render with current page after data update
+                    window.renderScoreTable(currentPageScore); // Re-render with current page after data update
                 }, (error) => console.error(`Error memuat siswa dari grup ${dbName}:`, error));
             }
         });
     }
 
-    function renderStudentTable() {
+    window.renderStudentTable = (page = 1) => { // Made global
+        currentPageStudent = page;
         studentTableBody.innerHTML = '';
         let studentsToDisplay = studentCache;
 
         const searchId = document.getElementById('studentSearchId').value.trim();
         if (searchId) {
-            studentsToDisplay = studentsToDisplay.filter(student => student.id.includes(searchId));
+            studentsToDisplay = studentsToDisplay.filter(student => student.id && student.id.includes(searchId));
         }
 
         const searchName = document.getElementById('studentSearchName').value.trim().toUpperCase();
         if (searchName) {
-            studentsToDisplay = studentsToDisplay.filter(student => student.name.toUpperCase().includes(searchName));
+            studentsToDisplay = studentsToDisplay.filter(student => student.name && student.name.toUpperCase().includes(searchName));
         }
         
         const searchClass = document.getElementById('studentSearchClass').value.trim().toUpperCase();
         if (searchClass) {
-            studentsToDisplay = studentsToDisplay.filter(student => student.class.toUpperCase().includes(searchClass));
+            studentsToDisplay = studentsToDisplay.filter(student => student.class && student.class.toUpperCase().includes(searchClass));
         }
         
-        const examStatusFilterToken = examStatusFilterDropdown.value;
+        const examStatusFilterToken = document.getElementById('examStatusFilter').value; // Get the token filter value
         if (examStatusFilterToken) {
             const selectedTokenForStatus = tokenCache.find(t => t.key === examStatusFilterToken);
             if (selectedTokenForStatus) {
                 const tokenClassNumeric = getNumericClass(selectedTokenForStatus.kelas);
-                studentsToDisplay = studentsToDisplay.filter(student => getNumericClass(student.class) === tokenClassNumeric);
+                studentsToDisplay = studentsToDisplay.filter(student => student.class && getNumericClass(student.class) === tokenClassNumeric);
             }
         }
+
+        // Apply new overall status filter
+        const selectedOverallStatus = studentOverallStatusFilter.value;
+        if (selectedOverallStatus && selectedOverallStatus !== "ALL") { // Check against "ALL" value
+            studentsToDisplay = studentsToDisplay.filter(student => {
+                let studentStatus = 'Belum login'; // Default status
+                const studentNumericClass = getNumericClass(student.class);
+                const relevantTokensForStudent = tokenCache.filter(token => getNumericClass(token.kelas) === studentNumericClass);
+                
+                let hasSubmittedAny = false, isLoggedInForAny = false, hasAccessedAny = false;
+
+                for (const token of relevantTokensForStudent) {
+                    // Check if token.firebaseKeys exists and is iterable
+                    if (token && token.firebaseKeys instanceof Set) {
+                        for (const fbKey of token.firebaseKeys) {
+                            const accessData = tokenAccessStatus?.[fbKey]?.[student.id];
+                            const submissionData = submittedExamsCache?.[fbKey]?.[student.id];
+
+                            if (submissionData?.isSubmitted) hasSubmittedAny = true;
+                            if (accessData?.isLoggedIn) isLoggedInForAny = true;
+                            if (accessData?.accessCount > 0) hasAccessedAny = true;
+                        }
+                    }
+                }
+
+                if(hasSubmittedAny) { studentStatus = 'Sudah submit'; }
+                else if(isLoggedInForAny) { studentStatus = 'Sedang mengerjakan'; }
+                else if(hasAccessedAny) { studentStatus = 'Belum login (reset)'; }
+                // else { studentStatus remains 'Belum login' }
+
+                return studentStatus === selectedOverallStatus;
+            });
+        }
         
-        studentsToDisplay.forEach((student, index) => {
+        filteredStudents = studentsToDisplay; // Store filtered results for pagination
+        const totalPages = Math.ceil(filteredStudents.length / selectedItemsPerPage);
+        // Adjust current page if it's now out of bounds after filtering
+        if (currentPageStudent > totalPages && totalPages > 0) {
+            currentPageStudent = totalPages;
+        } else if (totalPages === 0) {
+            currentPageStudent = 1; // No pages, show first page
+        }
+        const startIndex = (currentPageStudent - 1) * selectedItemsPerPage;
+        const endIndex = startIndex + selectedItemsPerPage;
+        const studentsForPage = filteredStudents.slice(startIndex, endIndex);
+
+        studentsForPage.forEach((student, index) => {
             const row = document.createElement('tr');
             let studentStatus = '-', statusColor = 'black';
             const studentNumericClass = getNumericClass(student.class);
@@ -1268,12 +1502,17 @@
             let hasSubmittedAny = false, isLoggedInForAny = false, hasAccessedAny = false;
 
             for (const token of relevantTokensForStudent) {
-                const accessData = tokenAccessStatus[token.key] && tokenAccessStatus[token.key][student.id];
-                const submissionData = submittedExamsCache[token.key] && submittedExamsCache[token.key][student.id];
+                // Check if token.firebaseKeys exists and is iterable
+                if (token && token.firebaseKeys instanceof Set) {
+                    for (const fbKey of token.firebaseKeys) {
+                        const accessData = tokenAccessStatus?.[fbKey]?.[student.id];
+                        const submissionData = submittedExamsCache?.[fbKey]?.[student.id];
 
-                if (submissionData?.isSubmitted) hasSubmittedAny = true;
-                if (accessData?.isLoggedIn) isLoggedInForAny = true;
-                if (accessData?.accessCount > 0) hasAccessedAny = true;
+                        if (submissionData?.isSubmitted) hasSubmittedAny = true;
+                        if (accessData?.isLoggedIn) isLoggedInForAny = true;
+                        if (accessData?.accessCount > 0) hasAccessedAny = true;
+                    }
+                }
             }
 
             if(hasSubmittedAny) { studentStatus = 'Sudah submit'; statusColor = 'green'; }
@@ -1282,7 +1521,7 @@
             else { studentStatus = 'Belum login'; statusColor = 'red'; }
 
             row.innerHTML = `
-                <td>${index + 1}</td><td>${escapeHtmlAttributeForJsString(student.id)}</td><td>${escapeHtmlAttributeForJsString(student.name)}</td><td>${escapeHtmlAttributeForJsString(student.class)}</td><td>${padRoomNumber(student.room)}</td>
+                <td>${startIndex + index + 1}</td><td>${escapeHtmlAttributeForJsString(student.id)}</td><td>${escapeHtmlAttributeForJsString(student.name)}</td><td>${escapeHtmlAttributeForJsString(student.class)}</td><td>${padRoomNumber(student.room)}</td>
                 <td style="color: ${statusColor}; font-weight: bold;">${studentStatus}</td>
                 <td><div class="action-buttons-group">
                     <button class="icon-button edit" onclick="openEditStudentModal('${escapeHtmlAttributeForJsString(student.key)}')" title="Edit Data Siswa"><i class="fas fa-edit"></i></button>
@@ -1293,7 +1532,40 @@
                 </div></td>`;
             studentTableBody.appendChild(row);
         });
+        renderPaginationControls(studentPaginationDiv, currentPageStudent, totalPages, 'renderStudentTable');
+    }; // End window.renderStudentTable
+
+    // New pagination rendering function
+    function renderPaginationControls(container, currentPage, totalPages, renderFunction) {
+        container.innerHTML = '';
+        if (totalPages <= 1) return;
+
+        const prevButton = document.createElement('button');
+        prevButton.innerText = 'Sebelumnya';
+        prevButton.disabled = currentPage === 1;
+        prevButton.onclick = () => window[renderFunction](currentPage - 1);
+        container.appendChild(prevButton);
+
+        const pageSpan = document.createElement('span');
+        pageSpan.innerText = `Halaman ${currentPage} dari ${totalPages}`;
+        container.appendChild(pageSpan);
+
+        const nextButton = document.createElement('button');
+        nextButton.innerText = 'Berikutnya';
+        nextButton.disabled = currentPage === totalPages;
+        nextButton.onclick = () => window[renderFunction](currentPage + 1);
+        container.appendChild(nextButton);
     }
+
+    // Function to update items per page and re-render tables
+    window.updateItemsPerPage = (value) => {
+        selectedItemsPerPage = parseInt(value, 10);
+        // Ensure the dropdown reflects the current selection on initial load/section change
+        document.getElementById('itemsPerPageSelect').value = selectedItemsPerPage; 
+        window.renderStudentTable(1); // Reset student table to page 1 with new items per page
+        window.renderScoreTable(1);   // Reset score table to page 1 with new items per page
+    };
+
 
     async function handleAddStudent(e) {
         e.preventDefault();
@@ -1356,10 +1628,10 @@
         try {
             if (oldDb.app.name !== newDb.app.name) {
                 await remove(ref(oldDb, 'students/' + currentStudentKey));
-                await push(ref(newDb, 'students'), updatedStudentData);
+                await push(ref(newDb, 'students'), updatedData);
                 showNotification(`Siswa berhasil dipindahkan ke kelas ${newStudentClass}!`);
             } else {
-                await update(ref(newDb, 'students/' + currentStudentKey), updatedStudentData);
+                await update(ref(newDb, 'students/' + currentStudentKey), updatedData);
                 showNotification('Data siswa berhasil diperbarui.');
             }
             closeEditStudentModal();
@@ -1391,7 +1663,7 @@
     window.closeAccessDetailModal = () => document.getElementById('accessDetailModal').style.display = 'none';
     window.closeEditStudentModal = () => { document.getElementById('editStudentModal').style.display = 'none'; currentStudentKey = null; };
     window.closeDeleteStudentConfirmModal = () => { document.getElementById('deleteStudentConfirmModal').style.display = 'none'; deleteStudentKey = null; };
-    window.openImportStudentModal = () => { document.getElementById('importStudentModal').style.display = 'flex'; document.getElementById('csvFileInput').value = ''; document.getElementById('importFileError').innerText = ''; };
+    window.openImportStudentModal = () => { document.getElementById('importStudentModal').style.display = 'flex'; document.getElementById('csvFileInput').value = ''; document.getElementById('importFileError').innerText = 'Pilih file CSV.'; };
     window.closeImportStudentModal = () => document.getElementById('importStudentModal').style.display = 'none';
     window.closeImportResultModal = () => document.getElementById('importResultModal').style.display = 'none';
     window.openEmptyStudentsModal = () => { document.getElementById('emptyStudentsModal').style.display = 'flex'; document.getElementById('emptyStudentsPassword').value = ''; document.getElementById('emptyStudentsPasswordError').innerText = ''; };
@@ -1411,25 +1683,111 @@
     };
     window.closeCopyPrintModal = () => { document.getElementById('copyPrintModal').style.display = 'none'; };
     window.copyTableToClipboard = () => {
-        const table = document.getElementById(currentTableIdToCopy);
-        if (!table) return showNotification('Tabel tidak ditemukan.');
-        const tempDiv = document.createElement('div');
-        tempDiv.style.position = 'absolute'; tempDiv.style.left = '-9999px';
-        tempDiv.innerHTML = table.outerHTML;
-        document.body.appendChild(tempDiv);
-        const range = document.createRange();
-        range.selectNode(tempDiv);
-        window.getSelection().removeAllRanges();
-        window.getSelection().addRange(range);
+        let textToCopy = '';
+        if (currentTableIdToCopy === 'tokenTable') {
+            const header = `NO\tMAPEL\tKELAS\tTOKEN\tDIBUKA\tDITUTUP\tDURASI\n`;
+            let body = '';
+            // Re-use consolidatedTokens for accurate and full data
+            let consolidatedTokens = Array.from(consolidatedTokensMap.values());
+            const searchSubject = document.getElementById('tokenSearchSubject').value.trim().toUpperCase();
+            if (searchSubject) {
+                consolidatedTokens = consolidatedTokens.filter(token => token.subject.toUpperCase().includes(searchSubject));
+            }
+            consolidatedTokens.sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime() || String(a.kelas || '').localeCompare(String(b.kelas || '')));
+
+            consolidatedTokens.forEach((data, index) => {
+                const startTimeFull = data.startTime ? new Date(data.startTime).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) : '-';
+                const endTimeFull = data.endTime ? new Date(data.endTime).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) : '-';
+                const durationFull = data.durationMinutes ? `${data.durationMinutes} menit` : '-';
+
+                body += `${index + 1}\t${data.subject}\t${data.kelas}\t${data.token}\t${startTimeFull}\t${endTimeFull}\t${durationFull}\n`;
+            });
+            textToCopy = header + body;
+
+        } else if (currentTableIdToCopy === 'scoreTable') { // Specific copy logic for score table
+            let header = `NO\tNAMA SISWA\tKELAS`;
+            const subjects = new Set();
+            // Collect all subjects from relevant tokens based on current filter
+            let studentsForCopy = studentCache;
+            if (window.currentScoreGradeFilter !== 'ALL') {
+                studentsForCopy = studentsForCopy.filter(s => getNumericClass(s.class) === window.currentScoreGradeFilter);
+            }
+            
+            // Apply search filters if present for score table
+            const scoreSearchName = document.getElementById('scoreSearchName').value.trim().toUpperCase();
+            if (scoreSearchName) studentsForCopy = studentsForCopy.filter(student => student.name.toUpperCase().includes(scoreSearchName));
+            
+            const scoreSearchClass = document.getElementById('scoreSearchClass').value.trim().toUpperCase();
+            if (scoreSearchClass) studentsForCopy = studentsForCopy.filter(student => student.class.toUpperCase().includes(scoreSearchClass));
+
+
+            studentsForCopy.forEach(student => {
+                const studentNumericClass = getNumericClass(student.class);
+                tokenCache.filter(token => getNumericClass(token.kelas) === studentNumericClass).forEach(token => {
+                    // Check if token.firebaseKeys is defined and is an array before iterating
+                    if (token.firebaseKeys && Array.isArray(Array.from(token.firebaseKeys))) {
+                        Array.from(token.firebaseKeys).forEach(fbKey => { 
+                            // Check if studentAnswersCache[fbKey] and studentAnswersCache[fbKey][student.id] exist
+                            const answerData = studentAnswersCache?.[fbKey]?.[student.id];
+                            if (answerData) {
+                                 subjects.add(token.subject);
+                            }
+                        });
+                    }
+                });
+            });
+            const sortedSubjects = Array.from(subjects).sort();
+            sortedSubjects.forEach(subject => header += `\t${subject}`);
+            header += `\n`;
+
+            let body = '';
+            studentsForCopy.forEach((student, index) => {
+                let rowData = `${index + 1}\t${student.name}\t${student.class}`;
+                sortedSubjects.forEach(subject => {
+                    let score = '-';
+                    const tokenInfo = Array.from(consolidatedTokensMap.values()).find(t => t.subject === subject && getNumericClass(t.kelas) === getNumericClass(student.class));
+                    if(tokenInfo){
+                        for(const fbKey of Array.from(tokenInfo.firebaseKeys)){
+                             // Ensure answerData exists before trying to calculate score
+                             const answerData = studentAnswersCache?.[fbKey]?.[student.id];
+                             if (answerData) {
+                                 score = calculateScore(answerData.answers, tokenInfo.answerKey);
+                                 break;
+                             }
+                        }
+                    }
+                    rowData += `\t${score}`;
+                });
+                body += rowData + '\n';
+            });
+            textToCopy = header + body;
+
+        } else {
+            const table = document.getElementById(currentTableIdToCopy);
+            if (!table) { showNotification('Tabel tidak ditemukan.'); return; }
+            // Fallback for other tables to copy visible text
+            const rows = table.querySelectorAll('tr');
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('th, td');
+                const rowText = Array.from(cells).map(cell => cell.innerText.trim()).join('\t');
+                textToCopy += rowText + '\n';
+            });
+        }
+        
+        // Use a temporary textarea for copying to clipboard
+        const tempTextArea = document.createElement('textarea');
+        tempTextArea.value = textToCopy;
+        document.body.appendChild(tempTextArea);
+        tempTextArea.select();
         try {
             document.execCommand('copy');
             showNotification('Tabel berhasil disalin.');
         } catch (err) {
             showNotification('Gagal menyalin tabel.');
+        } finally {
+            document.body.removeChild(tempTextArea);
+            closeCopyPrintModal();
         }
-        window.getSelection().removeAllRanges();
-        document.body.removeChild(tempDiv);
-        closeCopyPrintModal();
     };
 
     function updateTime() {
@@ -1466,14 +1824,41 @@
     window.confirmDeleteStudent = async () => {
         if (!deleteStudentKey) return;
         const studentToDelete = studentCache.find(s => s.key === deleteStudentKey);
-        if (!studentToDelete) return showNotification("Siswa tidak ditemukan.");
+        if (!studentToDelete || !studentToDelete.class) { // Add check for studentToDelete.class
+            showNotification("Siswa tidak ditemukan atau data tidak lengkap.");
+            closeDeleteStudentConfirmModal();
+            return;
+        }
         const targetDb = getDbForClass(studentToDelete.class);
-        if (!targetDb || Array.isArray(targetDb)) return showNotification("Gagal menghapus: Database tidak ditemukan.");
+        if (!targetDb || Array.isArray(targetDb)) {
+            showNotification("Gagal menghapus: Instance database tidak ditemukan untuk identifier: " + studentToDelete.class); // More specific error
+            closeDeleteStudentConfirmModal();
+            return;
+        }
 
         loadingOverlay.style.display = 'flex';
         try {
-            await remove(ref(targetDb, 'students/' + deleteStudentKey));
-            showNotification('Siswa berhasil dihapus.');
+            // Collect all relevant token keys for this student's class across all related tokens
+            const studentNumericClass = getNumericClass(studentToDelete.class);
+            const relevantTokensForStudent = tokenCache.filter(token => getNumericClass(token.kelas) === studentNumericClass);
+
+            const deletePromises = [
+                remove(ref(targetDb, `students/${deleteStudentKey}`)) // Delete the student node
+            ];
+
+            // For each relevant token, delete access status, submitted exams, and student answers for this student
+            for (const token of relevantTokensForStudent) {
+                if (token.firebaseKeys && Array.isArray(Array.from(token.firebaseKeys))) {
+                    Array.from(token.firebaseKeys).forEach(fbKey => {
+                        deletePromises.push(remove(ref(targetDb, `exam_access_status/${fbKey}/${studentToDelete.id}`)));
+                        deletePromises.push(remove(ref(targetDb, `submitted_exams/${fbKey}/${studentToDelete.id}`)));
+                        deletePromises.push(remove(ref(targetDb, `student_answers/${fbKey}/${studentToDelete.id}`)));
+                    });
+                }
+            }
+
+            await Promise.all(deletePromises);
+            showNotification('Siswa berhasil dihapus beserta data ujiannya!');
         } catch (error) {
             showNotification("Gagal menghapus siswa: " + error.message);
         } finally {
@@ -1482,12 +1867,42 @@
         }
     };
 
+    // Helper function to display import results consistently
+    function showImportResult(importedCount, skippedCount, details) {
+        document.getElementById('importResultSummary').innerHTML = `Berhasil: <b style="color:green;">${importedCount}</b>, Gagal: <b style="color:red;">${skippedCount}</b>`;
+        const detailsList = document.getElementById('importResultDetails');
+        detailsList.innerHTML = '';
+        if (details.length > 0) {
+            details.forEach(d => {
+                const li = document.createElement('li');
+                li.style.color = 'red';
+                li.innerText = d;
+                detailsList.appendChild(li);
+            });
+        } else {
+            const li = document.createElement('li');
+            li.innerText = "Tidak ada detail kesalahan.";
+            detailsList.appendChild(li);
+        }
+        document.getElementById('importResultModal').style.display = 'flex';
+    }
+
     window.processCsvFile = async () => {
         if (isImporting) return showNotification('Proses impor sedang berjalan.');
         const file = document.getElementById('csvFileInput').files[0];
         const importFileError = document.getElementById('importFileError');
-        if (!file) return importFileError.innerText = 'Pilih file CSV.';
-        if (file.type !== 'text/csv' && !file.name.endsWith('.csv')) return importFileError.innerText = 'File harus berformat CSV.';
+        
+        // Reset error message
+        importFileError.innerText = '';
+
+        if (!file) {
+            importFileError.innerText = 'Pilih file CSV.';
+            return;
+        }
+        if (file.type !== 'text/csv' && !file.name.endsWith('.csv')) {
+            importFileError.innerText = 'File harus berformat CSV.';
+            return;
+        }
 
         isImporting = true;
         loadingOverlay.style.display = 'flex';
@@ -1499,44 +1914,98 @@
             const batchUpdateMap = {};
             Object.keys(dbInstances).forEach(name => batchUpdateMap[name] = {});
 
-            for (let i = 1; i < lines.length; i++) {
-                const parts = lines[i].split(',').map(p => p.trim());
+            if (lines.length <= 1) { // Only header or empty file
+                showImportResult(0, 0, ["File CSV kosong atau hanya berisi header."]);
+                isImporting = false;
+                loadingOverlay.style.display = 'none';
+                closeImportStudentModal();
+                return;
+            }
+
+            for (let i = 1; i < lines.length; i++) { // Start from the second line (index 1) for data
+                let parts = lines[i].split(',');
+                // If comma-delimited parts are not 4, try semicolon
+                if (parts.length !== 4) {
+                    parts = lines[i].split(';');
+                }
+                
+                parts = parts.map(p => p.trim());
+
                 if (parts.length !== 4) {
                     skippedCount++;
-                    errorDetails.push(`Baris ${i + 1}: Format tidak valid.`);
+                    errorDetails.push(`Baris ${i + 1}: Format kolom tidak valid (diharapkan 4 kolom, ditemukan ${parts.length}). Baris: "${lines[i]}"`);
                     continue;
                 }
+
                 const [id, name, studentClass, studentRoom] = parts;
                 const paddedId = padStudentId(id);
-                
-                if (!VALID_ROMBELS.includes(studentClass.toUpperCase())) {
-                    skippedCount++; errorDetails.push(`Baris ${i + 1}: Kelas '${studentClass}' tidak valid.`); continue;
+
+                // More robust ID validation for CSV
+                if (!/^\d+$/.test(id)) { // Check if original ID is purely numeric before padding
+                    skippedCount++;
+                    errorDetails.push(`Baris ${i + 1}: ID Siswa '${id}' tidak valid (harus angka).`);
+                    continue;
                 }
-                const targetDbName = rombelToDbMap[studentClass.toUpperCase()];
+                
+                const upperCaseClass = studentClass.toUpperCase();
+                if (!VALID_ROMBELS.includes(upperCaseClass)) {
+                    skippedCount++;
+                    errorDetails.push(`Baris ${i + 1}: Kelas '${studentClass}' tidak valid. Gunakan format seperti 7A, 8B, 9C, dll.`);
+                    continue;
+                }
+                
+                const targetDbName = rombelToDbMap[upperCaseClass];
+                // This check is redundant if VALID_ROMBELS correctly maps to existing dbInstances,
+                // but kept as a safeguard against potential future data inconsistencies.
+                if (!targetDbName || !dbInstances[targetDbName]) { 
+                    skippedCount++;
+                    errorDetails.push(`Baris ${i + 1}: Kelas '${studentClass}' tidak memiliki konfigurasi database yang valid.`);
+                    continue;
+                }
+
+                // Check for duplicate ID within the target Firebase group
                 if (studentCache.some(s => s.id === paddedId && s.firebaseGroup === targetDbName)) {
-                    skippedCount++; errorDetails.push(`Baris ${i + 1}: ID '${id}' sudah ada.`); continue;
+                    skippedCount++;
+                    errorDetails.push(`Baris ${i + 1}: ID Siswa '${id}' sudah ada di kelas ${studentClass}.`);
+                    continue;
                 }
                 
+                // Ensure name is not empty
+                if (!name) {
+                    skippedCount++;
+                    errorDetails.push(`Baris ${i + 1}: Nama Siswa tidak boleh kosong.`);
+                    continue;
+                }
+
                 const newRef = push(ref(dbInstances[targetDbName], 'students'));
-                batchUpdateMap[targetDbName][newRef.key] = { id: paddedId, name: name.toUpperCase(), class: studentClass.toUpperCase(), room: padRoomNumber(studentRoom), isLoggedIn: false };
+                if (!batchUpdateMap[targetDbName]) {
+                    batchUpdateMap[targetDbName] = {};
+                }
+                batchUpdateMap[targetDbName][newRef.key] = { id: paddedId, name: name.toUpperCase().replace(/'/g, ''), class: upperCaseClass, room: padRoomNumber(studentRoom), isLoggedIn: false };
                 importedCount++;
             }
             
+            let firebaseErrors = [];
             try {
                 const batchPromises = Object.keys(batchUpdateMap).map(dbName => {
-                    if (Object.keys(batchUpdateMap[dbName]).length > 0) return update(ref(dbInstances[dbName], 'students'), batchUpdateMap[dbName]);
-                }).filter(Boolean);
+                    if (Object.keys(batchUpdateMap[dbName]).length > 0) {
+                        console.log(`Mengirim ${Object.keys(batchUpdateMap[dbName]).length} siswa ke Firebase group: ${dbName}`);
+                        return update(ref(dbInstances[dbName], 'students'), batchUpdateMap[dbName]);
+                    }
+                    return Promise.resolve(); // Ensure a promise is returned even if no updates for this db
+                }).filter(Boolean); // Filter out any undefined promises if map returns null/undefined
+                
                 await Promise.all(batchPromises);
                 showNotification(`${importedCount} siswa berhasil diimpor!`);
             } catch (error) {
-                showNotification(`Gagal mengimpor data: ${error.message}`);
+                showNotification(`Gagal mengimpor data ke Firebase: ${error.message}`);
+                firebaseErrors.push(`Firebase Error: ${error.message}`);
+                console.error("Firebase import error:", error);
             } finally {
                 isImporting = false;
                 loadingOverlay.style.display = 'none';
                 closeImportStudentModal();
-                document.getElementById('importResultSummary').innerHTML = `Berhasil: <b style="color:green;">${importedCount}</b>, Gagal: <b style="color:orange;">${skippedCount}</b>`;
-                document.getElementById('importResultDetails').innerHTML = errorDetails.map(d => `<li style="color:red;">${d}</li>`).join('');
-                document.getElementById('importResultModal').style.display = 'flex';
+                showImportResult(importedCount, skippedCount, errorDetails.concat(firebaseErrors));
             }
         };
         reader.readAsText(file);
@@ -1561,6 +2030,39 @@
             closeEmptyStudentsModal();
         }
     };
+
+    // New: Empty Tokens button logic
+    window.promptEmptyTokens = () => {
+        document.getElementById('emptyTokensPassword').value = ''; // Clear password field
+        document.getElementById('emptyTokensPasswordError').innerText = ''; // Clear error message
+        document.getElementById('emptyTokensModal').style.display = 'flex';
+    };
+
+    window.confirmEmptyTokens = async () => {
+        if (document.getElementById('emptyTokensPassword').value !== ADMIN_PASS) {
+            document.getElementById('emptyTokensPasswordError').innerText = "Password salah!";
+            return;
+        }
+
+        loadingOverlay.style.display = 'flex';
+        try {
+            const deletePromises = Object.values(dbInstances).flatMap(db => [
+                remove(ref(db, 'tokens')), // Remove all tokens
+                remove(ref(db, 'exam_access_status')), // Remove associated access status
+                remove(ref(db, 'submitted_exams')), // Remove submitted exam data
+                remove(ref(db, 'student_answers')) // Remove student answers
+            ]);
+            await Promise.all(deletePromises);
+            showNotification('Semua token dan data terkait berhasil dikosongkan!');
+        } catch (error) {
+            showNotification('Gagal mengosongkan token: ' + error.message);
+        } finally {
+            loadingOverlay.style.display = 'none';
+            closeEmptyTokensModal();
+        }
+    };
+    window.closeEmptyTokensModal = () => document.getElementById('emptyTokensModal').style.display = 'none';
+
     
     function populateExamStatusFilter() {
         examStatusFilterDropdown.innerHTML = '<option value="">PILIH TOKEN UJIAN</option>';
@@ -1570,49 +2072,88 @@
             option.innerText = `${token.token} (${token.subject} Kls ${token.kelas})`;
             examStatusFilterDropdown.appendChild(option);
         });
-        if (examStatusFilterDropdown.value) renderStudentTable();
+        // Ensure filter is applied if there's a pre-selected value
+        if (examStatusFilterDropdown.value) window.renderStudentTable(1);
     }
     
-    function renderScoreTable() {
+    window.renderScoreTable = (page = 1) => { // Made global
+        currentPageScore = page;
         scoreTableHeader.innerHTML = '<th>NO</th><th>NAMA SISWA</th><th>KELAS</th>';
         scoreTableBody.innerHTML = '';
         const subjects = new Set();
-        Array.from(consolidatedTokensMap.values()).forEach(token => {
-            if (Array.from(token.firebaseKeys).some(fbKey => studentAnswersCache[fbKey])) {
-                subjects.add(token.subject);
-            }
+        let studentsToDisplay = studentCache; // Start with all students
+        
+        // Filter students by grade if currentScoreGradeFilter is set
+        if (window.currentScoreGradeFilter !== 'ALL') {
+            studentsToDisplay = studentsToDisplay.filter(student => student.class && getNumericClass(student.class) === window.currentScoreGradeFilter);
+        }
+
+        // Apply search filters if present for score table (on the filtered students)
+        const scoreSearchName = document.getElementById('scoreSearchName').value.trim().toUpperCase();
+        if (scoreSearchName) {
+            studentsToDisplay = studentsToDisplay.filter(student => student.name && student.name.toUpperCase().includes(scoreSearchName));
+        }
+        
+        const scoreSearchClass = document.getElementById('scoreSearchClass').value.trim().toUpperCase();
+        if (scoreSearchClass) {
+            studentsToDisplay = studentsToDisplay.filter(student => student.class && student.class.toUpperCase().includes(scoreSearchClass));
+        }
+
+        // Now, collect subjects based on the *filtered* students and their available answers
+        studentsToDisplay.forEach(student => {
+            const studentNumericClass = getNumericClass(student.class);
+            // Filter tokens relevant to the student's class, then check their answers
+            tokenCache.filter(token => token.kelas && getNumericClass(token.kelas) === studentNumericClass).forEach(token => {
+                // Check if token.firebaseKeys is defined and is an array before iterating
+                if (token.firebaseKeys && token.firebaseKeys instanceof Set) { 
+                    Array.from(token.firebaseKeys).forEach(fbKey => { 
+                        // Check if studentAnswersCache[fbKey] and studentAnswersCache[fbKey][student.id] exist
+                        const answerData = studentAnswersCache?.[fbKey]?.[student.id];
+                        if (answerData) {
+                             subjects.add(token.subject);
+                        }
+                    });
+                }
+            });
         });
+        
         const sortedSubjects = Array.from(subjects).sort();
         sortedSubjects.forEach(subject => scoreTableHeader.innerHTML += `<th>${subject.substring(0, 5)}</th>`);
         
-        let studentsToDisplay = studentCache;
-        
-        const searchName = document.getElementById('scoreSearchName').value.trim().toUpperCase();
-        if (searchName) studentsToDisplay = studentsToDisplay.filter(student => student.name.toUpperCase().includes(searchName));
-        
-        const searchClass = document.getElementById('scoreSearchClass').value.trim().toUpperCase();
-        if (searchClass) studentsToDisplay = studentsToDisplay.filter(student => student.class.toUpperCase().includes(searchClass));
+        filteredScores = studentsToDisplay; // Store filtered results for pagination
+        const totalPages = Math.ceil(filteredScores.length / selectedItemsPerPage);
+        // Adjust current page if it's now out of bounds after filtering
+        if (currentPageScore > totalPages && totalPages > 0) {
+            currentPageScore = totalPages;
+        } else if (totalPages === 0) {
+            currentPageScore = 1; // No pages, show first page
+        }
+        const startIndex = (currentPageScore - 1) * selectedItemsPerPage;
+        const endIndex = startIndex + selectedItemsPerPage;
+        const scoresForPage = filteredScores.slice(startIndex, endIndex);
 
-        studentsToDisplay.forEach((student, index) => {
+        scoresForPage.forEach((student, index) => {
             const row = document.createElement('tr');
-            row.innerHTML = `<td>${index + 1}</td><td>${student.name}</td><td>${student.class}</td>`;
+            row.innerHTML = `<td>${startIndex + index + 1}</td><td>${student.name}</td><td>${student.class}</td>`;
             sortedSubjects.forEach(subject => {
                 let score = '-';
                 const tokenInfo = Array.from(consolidatedTokensMap.values()).find(t => t.subject === subject && getNumericClass(t.kelas) === getNumericClass(student.class));
                 if(tokenInfo){
-                    for(const fbKey of Array.from(tokenInfo.firebaseKeys)){
-                         const answerData = studentAnswersCache[fbKey] && studentAnswersCache[fbKey][student.id];
-                         if (answerData) {
-                             score = calculateScore(answerData.answers, tokenInfo.answerKey);
-                             break;
-                         }
+                    for(const fbKey of tokenInfo.firebaseKeys){
+                             // Ensure answerData exists before trying to calculate score
+                             const answerData = studentAnswersCache?.[fbKey]?.[student.id];
+                             if (answerData) {
+                                 score = calculateScore(answerData.answers, tokenInfo.answerKey);
+                                 break;
+                             }
+                        }
                     }
-                }
                 row.innerHTML += `<td>${score}</td>`;
             });
             scoreTableBody.appendChild(row);
         });
-    }
+        renderPaginationControls(scorePaginationDiv, currentPageScore, totalPages, 'renderScoreTable');
+    }; // End window.renderScoreTable
 
     function calculateScore(studentAnswersString, answerKeyString) {
         if (!answerKeyString || !studentAnswersString) return 0;
@@ -1639,14 +2180,24 @@
         if (!studentIdForAction || !studentClassForAction) return;
         const targetDb = getDbForClass(studentClassForAction);
         if (!targetDb || Array.isArray(targetDb)) return showNotification("Gagal: Database tidak ditemukan.");
+        
+        // Check if student is already reset
+        const student = studentCache.find(s => s.key === studentKeyForAction);
+        if (student && student.isLoggedIn === false) {
+            showNotification(`Siswa ${studentIdForAction} sudah dalam status direset.`);
+            closeResetStudentModal();
+            return;
+        }
+
         loadingOverlay.style.display = 'flex';
         try {
             const updates = {};
             updates[`students/${studentKeyForAction}/isLoggedIn`] = false;
             
-            const relevantTokens = tokenCache.filter(token => getNumericClass(token.kelas) === getNumericClass(studentClassForAction) && token.firebaseGroup === targetDb.app.name);
+            const relevantTokens = tokenCache.filter(token => token.kelas && getNumericClass(token.kelas) === getNumericClass(studentClassForAction) && token.firebaseGroup === targetDb.app.name);
             for (const token of relevantTokens) {
-                updates[`exam_access_status/${token.key}/${studentIdForAction}/isLoggedIn`] = false;
+                // Set isLoggedIn to null to remove the entry, not just false, for a clean reset state
+                updates[`exam_access_status/${token.key}/${studentIdForAction}/isLoggedIn`] = false; // Set to false, not null, for consistent state
             }
             await update(ref(targetDb, '/'), updates);
             showNotification(`Status login siswa ${studentIdForAction} berhasil direset.`);
@@ -1672,7 +2223,7 @@
         loadingOverlay.style.display = 'flex';
         try {
             const updates = {};
-            const relevantTokens = tokenCache.filter(token => getNumericClass(token.kelas) === getNumericClass(studentClassForAction) && token.firebaseGroup === targetDb.app.name);
+            const relevantTokens = tokenCache.filter(token => token.kelas && getNumericClass(token.kelas) === getNumericClass(studentClassForAction) && token.firebaseGroup === targetDb.app.name);
             for (const token of relevantTokens) {
                  updates[`submitted_exams/${token.key}/${studentIdForAction}/isSubmitted`] = true;
                  updates[`submitted_exams/${token.key}/${studentIdForAction}/timestamp`] = Date.now();
@@ -1711,7 +2262,7 @@
         loadingOverlay.style.display = 'flex';
         try {
             const updates = {};
-            const relevantTokens = tokenCache.filter(token => getNumericClass(token.kelas) === getNumericClass(studentClassForAction) && token.firebaseGroup === targetDb.app.name);
+            const relevantTokens = tokenCache.filter(token => token.kelas && getNumericClass(token.kelas) === getNumericClass(studentClassForAction) && token.firebaseGroup === targetDb.app.name);
             for (const token of relevantTokens) {
                 updates[`submitted_exams/${token.key}/${studentIdForAction}`] = null;
                 updates[`student_answers/${token.key}/${studentIdForAction}`] = null;
@@ -1744,7 +2295,7 @@
             if (settings) {
                 isLockEnabledAdmin = settings.isLockEnabled || false;
                 currentLockKeyAdmin = settings.lockKey || "KUNCI";
-                toleranceLimitAdmin = settings.toleranceLimit || 3;
+                toleranceLimitAdmin = 3;
             }
             renderLockSettingsTable();
         }, (error) => console.error("Error memuat pengaturan kunci:", error));
@@ -1769,7 +2320,7 @@
             onValue(ref(dbInstances[dbName], 'exam_access_status'), (snapshot) => {
                 Object.assign(tokenAccessStatus, snapshot.val() || {});
                 renderTokenTable();
-                renderStudentTable();
+                window.renderStudentTable(currentPageStudent); // Re-render with current page after data update
             });
         });
     }
@@ -1780,8 +2331,8 @@
             onValue(ref(dbInstances[dbName], 'submitted_exams'), (snapshot) => {
                 Object.assign(submittedExamsCache, snapshot.val() || {});
                 renderTokenTable();
-                renderStudentTable();
-                renderScoreTable();
+                window.renderStudentTable(currentPageStudent); // Re-render with current page after data update
+                window.renderScoreTable(currentPageScore); // Re-render with current page after data update
             });
         });
     }
@@ -1791,7 +2342,7 @@
         Object.keys(dbInstances).forEach(dbName => {
             onValue(ref(dbInstances[dbName], 'student_answers'), (snapshot) => {
                 Object.assign(studentAnswersCache, snapshot.val() || {});
-                renderScoreTable();
+                window.renderScoreTable(currentPageScore); // Re-render with current page after data update
             });
         });
     }
