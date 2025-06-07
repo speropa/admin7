@@ -628,16 +628,15 @@
                 <input type="text" id="scoreSearchClass" placeholder="Cari Kelas (misal: 7A)" />
             </div>
         </div>
+        <p id="scoreTableMessage" style="text-align: center; color: #555; font-style: italic; margin: 20px 0;">Pilih tingkatan kelas untuk menampilkan daftar nilai.</p>
         <div class="table-responsive">
           <table id="scoreTable">
-            <thead>
-              <tr id="scoreTableHeader">
-                <th>NO</th>
-                <th>NAMA SISWA</th>
-                <th>KELAS</th>
-                </tr>
+            <thead id="scoreTableHeader">
+              <!-- Header will be generated dynamically -->
             </thead>
-            <tbody id="scoreTableBody"></tbody>
+            <tbody id="scoreTableBody">
+              <!-- Body will be generated dynamically -->
+            </tbody>
           </table>
         </div>
         <div id="scorePagination" class="pagination-controls"></div>
@@ -757,7 +756,7 @@
   <div id="deleteStudentConfirmModal" class="modal"><div class="modal-content"><p>Yakin ingin menghapus siswa ini?</p><button onclick="confirmDeleteStudent()" class="confirm-button">Hapus</button><button onclick="closeDeleteStudentConfirmModal()" class="cancel-button">Batal</button></div></div>
   <div id="importStudentModal" class="modal"><div class="modal-content"><h4>Import Data Peserta dari CSV</h4><p style="font-size: 0.9em; color: #555; text-align: left;">Perhatikan hal-hal berikut!<br>1. Siapkan data peserta dengan 4 kolom: ID Peserta (angka), Nama Lengkap, Kelas, dan Ruang<br>2. Simpan file dengan format *.csv (comma delimited)<br>3. Pastikan tidak ada kolom tambahan</p><a href="https://drive.google.com/uc?export=download&id=16rzsLjQ3AVm0wIPqWnzsauzbrwGfO7An" target="_blank" style="display: block; text-align: center; margin: 15px 0; padding: 10px 20px; background-color: #28a745; color: white; text-decoration: none; border-radius: 5px;">Unduh Template CSV</a> <input type="file" id="csvFileInput" accept=".csv" style="margin-top: 15px; margin-bottom: 10px;" /><p id="importFileError" class="error"></p><button onclick="processCsvFile()">Mulai Impor</button><button onclick="closeImportStudentModal()" class="cancel-button">Batal</button></div></div>
   <div id="importResultModal" class="modal"><div class="modal-content"><h4>Hasil Impor Data Siswa</h4><p id="importResultSummary"></p><ul id="importResultDetails" style="text-align: left; max-height: 200px; overflow-y: auto; border: 1px solid #eee; padding: 10px; border-radius: 5px;"></ul><button onclick="closeImportResultModal()">Tutup</button></div></div>
-  <div id="emptyStudentsModal" class="modal"><div class="modal-content"><h4>Kosongkan Daftar Peserta</h4><p>Anda yakin ingin menghapus <b>SEMUA</b> data peserta? Tindakan ini tidak dapat dibatalkan.</p><div><label for="emptyStudentsPassword">Password Admin:</label><input type="password" id="emptyStudentsPassword"><p id="emptyStudentsPasswordError" class="error"></p></div><button onclick="closeEmptyStudentsModal()" class="cancel-button">Batal</button><button onclick="confirmEmptyStudents()" class="confirm-button">Konfirmasi Hapus Semua</button></div></div>
+  <div id="emptyStudentsModal" class="modal"><div class="modal-content"><h4>Kosongkan Daftar Peserta</h4><p>Anda yakin ingin menghapus <b>SEMUA</b> data peserta? Tindakan ini tidak dapat dibatalkan.</p><div><label for="emptyStudentsPassword">Password Admin:</label><input type="password" id="emptyStudentsPassword"><p id="emptyStudentsPasswordError" class="error"></p></div><button onclick="confirmEmptyStudents()" class="confirm-button">Konfirmasi Hapus Semua</button><button onclick="closeEmptyStudentsModal()" class="cancel-button">Batal</button></div></div>
   <div id="logoutConfirmModal" class="modal"><div class="modal-content"><h4>Konfirmasi Logout</h4><p>Anda yakin ingin keluar dari panel admin?</p><button onclick="confirmLogout()" class="confirm-button">Ya, Keluar</button><button onclick="closeLogoutModal()" class="cancel-button">Batal</button></div></div>
   <div id="resetStudentModal" class="modal"><div class="modal-content"><h4>Reset Status Login Siswa</h4><p>Anda yakin ingin mereset status login siswa <b id="resetStudentNameDisplay"></b> (ID: <b id="resetStudentIdDisplay"></b>)?</p><p style="font-size: 0.9em; color: #555;">Ini akan memaksa siswa untuk login ulang jika mereka sedang dalam sesi.</p><button onclick="closeResetStudentModal()" class="cancel-button">Batal</button><button onclick="confirmResetStudent()" class="confirm-button">Reset</button></div></div>
   <div id="submitAnswerModal" class="modal"><div class="modal-content"><h4>Kirim Jawaban Siswa (Manual)</h4><p>Anda yakin ingin menandai semua ujian yang sedang dikerjakan siswa <b id="submitStudentNameDisplay"></b> (ID: <b id="submitStudentIdDisplay"></b>) sebagai 'Sudah submit'?</p><p style="font-size: 0.9em; color: #555;">Tindakan ini akan mengunci jawaban siswa untuk ujian yang relevan.</p><button onclick="closeSubmitAnswerModal()" class="cancel-button">Batal</button><button onclick="confirmSubmitAnswer()" class="confirm-button">Kirim Jawaban</button></div></div>
@@ -868,6 +867,7 @@
     const itemsPerPageSelect = document.getElementById('itemsPerPageSelect'); // Get reference to the select element
     const scoreTableHeader = document.getElementById('scoreTableHeader');
     const scoreTableBody = document.getElementById('scoreTableBody');
+    const scoreTableMessage = document.getElementById('scoreTableMessage');
     const locationSettingsTableBody = document.getElementById('locationSettingsTableBody');
     const lockSettingsTableBody = document.getElementById('lockSettingsTableBody');
     const studentPaginationDiv = document.getElementById('studentPagination');
@@ -907,7 +907,7 @@
         console.error(`Instance database tidak ditemukan untuk identifier: ${classIdentifier}`);
         return null;
     };
-    const escapeHtmlAttributeForJsString = (s) => (s === undefined || s === null ? '' : String(s)).replace(/&/g, '&amp;').replace(/'/g, '&#39;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); // Modified here
+    const escapeHtmlAttributeForJsString = (s) => String(s).replace(/&/g, '&amp;').replace(/'/g, '&#39;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const convertToPreviewLink = (url) => (!url || typeof url !== 'string') ? url : url.replace(/\/view(\?usp=sharing)?$/, '/preview');
     const showNotification = (message) => {
         const n = document.getElementById('notification');
@@ -1003,13 +1003,12 @@
         if (sectionId === 'tokenSection') renderTokenTable();
         else if (sectionId === 'rulesSection') { updateSetlokasiStatusDisplay(); renderLockSettingsTable(); }
         else if (sectionId === 'studentSection') { 
-            // Set status filter to "Pilih Status Ujian" on initial section load
-            studentOverallStatusFilter.value = 'ALL'; // Set to "ALL" value
-            window.renderStudentTable(1); // Always start at page 1 for student section
+            studentOverallStatusFilter.value = 'ALL'; 
+            window.renderStudentTable(1); 
         } 
         else if (sectionId === 'scoreSection') {
-            window.currentScoreGradeFilter = 'ALL'; // Reset score grade filter to show all grades
-            window.renderScoreTable(1); // Always start at page 1 for score section
+            window.currentScoreGradeFilter = 'ALL'; // Reset filter
+            resetScoreTable(); // Call new function to reset the view
         }
     };
 
@@ -1315,16 +1314,16 @@
       if (!s || !newKelas || !t || !originalGoogleDriveUrl || !answerKey || !startTimeInput || !endTimeInput) return em.innerText = "Semua field harus diisi!";
 
       const originalStartTime = new Date(startTimeInput);
-      const originalEndTime = new Date(new Date(endTimeInput).getTime() + 30000); // Add 30 seconds for end time
+      const originalEndTime = new Date(endTimeInput);
       if (originalStartTime >= originalEndTime) return em.innerText = "Waktu token dibuka harus sebelum waktu token ditutup!";
       if (!/^[A-D](,[A-D])*$/.test(answerKey) && answerKey) return document.getElementById('editAnswerKeyError').innerText = "Format kunci jawaban tidak valid.";
       if (!originalGoogleDriveUrl.startsWith('http')) return document.getElementById('editGoogleDriveUrlError').innerText = "URL Google Drive tidak valid.";
       if (Array.from(consolidatedTokensMap.values()).some(item => item.token === t && item.kelas === newKelas && !(item.token === oldBaseToken && item.kelas === oldKelas))) return em.innerText = "Token (Base Token) sudah ada untuk kelas ini!";
 
       loadingOverlay.style.display = 'flex';
-      const adjustedStartTime = new Date(originalStartTime.getTime()); // No need to adjust start time by 30 seconds
+      const adjustedStartTime = new Date(originalStartTime.getTime() + 30000);
       const durationMinutes = Math.round((originalEndTime.getTime() - adjustedStartTime.getTime()) / 60000);
-      const updatedStudentData = { subject: s, kelas: newKelas, token: t, googleDriveUrl: googleDriveUrlPreview, originalGoogleDriveUrl, answerKey, startTime: formatLocalDateTime(adjustedStartTime), endTime: formatLocalDateTime(originalEndTime), durationMinutes, createdAt: currentConsolidatedTokenInfo.createdAt, isForceActive: currentConsolidatedTokenInfo.isForceActive, isActive: currentConsolidatedTokenInfo.isActive }; // Changed variable name to updatedStudentData
+      const updatedData = { subject: s, kelas: newKelas, token: t, googleDriveUrl: googleDriveUrlPreview, originalGoogleDriveUrl, answerKey, startTime: formatLocalDateTime(adjustedStartTime), endTime: endTimeInput, durationMinutes, createdAt: currentConsolidatedTokenInfo.createdAt, isForceActive: currentConsolidatedTokenInfo.isForceActive, isActive: currentConsolidatedTokenInfo.isActive };
 
       try {
           if (getNumericClass(oldKelas) !== getNumericClass(newKelas) || oldBaseToken !== t) {
@@ -1335,13 +1334,13 @@
               });
               await Promise.all(deletePromises);
               const newTargetDbs = getDbForClass(newKelas);
-              await Promise.all(newTargetDbs.map(db => push(ref(db, 'tokens'), updatedStudentData))); // Changed variable name to updatedStudentData
+              await Promise.all(newTargetDbs.map(db => push(ref(db, 'tokens'), updatedData)));
               showNotification(`Token berhasil dipindahkan ke kelas ${newKelas}!`);
           } else {
               const updatePromises = oldFirebaseKeys.map(fbKey => {
                   const token = tokenCache.find(tok => tok.key === fbKey);
                   const db = token ? dbInstances[token.firebaseGroup] : null;
-                  return db ? update(ref(db, `tokens/${fbKey}`), updatedStudentData) : Promise.resolve(); // Changed variable name to updatedStudentData
+                  return db ? update(ref(db, `tokens/${fbKey}`), updatedData) : Promise.resolve();
               });
               await Promise.all(updatePromises);
               showNotification('Token berhasil diedit!');
@@ -1390,30 +1389,16 @@
                 onValue(ref(dbInstance, 'students'), (snapshot) => {
                     const groupStudents = [];
                     snapshot.forEach(child => {
-                          const data = child.val();
-                          // Ensure data is valid before pushing, and has a key
-                          if (data && child.key) {
-                            data.key = child.key;
-                            data.firebaseGroup = dbName;
-                            // Ensure core properties are strings, replace undefined/null with empty string
-                            data.id = String(data.id || '');
-                            data.name = String(data.name || '');
-                            data.class = String(data.class || '');
-                            data.room = String(data.room || ''); // room can be optional, padRoomNumber handles empty string
-                            groupStudents.push(data);
-                          } else {
-                            console.warn("Skipping malformed student data:", child.val(), "from db:", dbName);
-                          }
+                        const data = child.val(); data.key = child.key; data.firebaseGroup = dbName; groupStudents.push(data);
                     });
                     studentCache = studentCache.filter(s => s.firebaseGroup !== dbName).concat(groupStudents);
                     studentCache.sort((a, b) => {
-                        const classA = String(a.class || '').toLowerCase(), classB = String(b.class || '').toLowerCase();
+                        const classA = String(a.class || ''), classB = String(b.class || '');
                         if(classA !== classB) return classA.localeCompare(classB);
-                        const nameA = String(a.name || '').toLowerCase(), nameB = String(b.name || '').toLowerCase();
-                        return nameA.localeCompare(nameB);
+                        return String(a.name || '').localeCompare(String(b.name || ''));
                     });
                     window.renderStudentTable(currentPageStudent); // Re-render with current page after data update
-                    window.renderScoreTable(currentPageScore); // Re-render with current page after data update
+                    resetScoreTable(); // Re-render score table if visible
                 }, (error) => console.error(`Error memuat siswa dari grup ${dbName}:`, error));
             }
         });
@@ -1426,17 +1411,17 @@
 
         const searchId = document.getElementById('studentSearchId').value.trim();
         if (searchId) {
-            studentsToDisplay = studentsToDisplay.filter(student => student.id && student.id.includes(searchId));
+            studentsToDisplay = studentsToDisplay.filter(student => student.id.includes(searchId));
         }
 
         const searchName = document.getElementById('studentSearchName').value.trim().toUpperCase();
         if (searchName) {
-            studentsToDisplay = studentsToDisplay.filter(student => student.name && student.name.toUpperCase().includes(searchName));
+            studentsToDisplay = studentsToDisplay.filter(student => student.name.toUpperCase().includes(searchName));
         }
         
         const searchClass = document.getElementById('studentSearchClass').value.trim().toUpperCase();
         if (searchClass) {
-            studentsToDisplay = studentsToDisplay.filter(student => student.class && student.class.toUpperCase().includes(searchClass));
+            studentsToDisplay = studentsToDisplay.filter(student => student.class.toUpperCase().includes(searchClass));
         }
         
         const examStatusFilterToken = document.getElementById('examStatusFilter').value; // Get the token filter value
@@ -1444,7 +1429,7 @@
             const selectedTokenForStatus = tokenCache.find(t => t.key === examStatusFilterToken);
             if (selectedTokenForStatus) {
                 const tokenClassNumeric = getNumericClass(selectedTokenForStatus.kelas);
-                studentsToDisplay = studentsToDisplay.filter(student => student.class && getNumericClass(student.class) === tokenClassNumeric);
+                studentsToDisplay = studentsToDisplay.filter(student => getNumericClass(student.class) === tokenClassNumeric);
             }
         }
 
@@ -1459,17 +1444,12 @@
                 let hasSubmittedAny = false, isLoggedInForAny = false, hasAccessedAny = false;
 
                 for (const token of relevantTokensForStudent) {
-                    // Check if token.firebaseKeys exists and is iterable
-                    if (token && token.firebaseKeys instanceof Set) {
-                        for (const fbKey of token.firebaseKeys) {
-                            const accessData = tokenAccessStatus?.[fbKey]?.[student.id];
-                            const submissionData = submittedExamsCache?.[fbKey]?.[student.id];
+                    const accessData = tokenAccessStatus[token.key] && tokenAccessStatus[token.key][student.id];
+                    const submissionData = submittedExamsCache[token.key] && submittedExamsCache[token.key][student.id];
 
-                            if (submissionData?.isSubmitted) hasSubmittedAny = true;
-                            if (accessData?.isLoggedIn) isLoggedInForAny = true;
-                            if (accessData?.accessCount > 0) hasAccessedAny = true;
-                        }
-                    }
+                    if (submissionData?.isSubmitted) hasSubmittedAny = true;
+                    if (accessData?.isLoggedIn) isLoggedInForAny = true;
+                    if (accessData?.accessCount > 0) hasAccessedAny = true;
                 }
 
                 if(hasSubmittedAny) { studentStatus = 'Sudah submit'; }
@@ -1483,12 +1463,6 @@
         
         filteredStudents = studentsToDisplay; // Store filtered results for pagination
         const totalPages = Math.ceil(filteredStudents.length / selectedItemsPerPage);
-        // Adjust current page if it's now out of bounds after filtering
-        if (currentPageStudent > totalPages && totalPages > 0) {
-            currentPageStudent = totalPages;
-        } else if (totalPages === 0) {
-            currentPageStudent = 1; // No pages, show first page
-        }
         const startIndex = (currentPageStudent - 1) * selectedItemsPerPage;
         const endIndex = startIndex + selectedItemsPerPage;
         const studentsForPage = filteredStudents.slice(startIndex, endIndex);
@@ -1502,17 +1476,12 @@
             let hasSubmittedAny = false, isLoggedInForAny = false, hasAccessedAny = false;
 
             for (const token of relevantTokensForStudent) {
-                // Check if token.firebaseKeys exists and is iterable
-                if (token && token.firebaseKeys instanceof Set) {
-                    for (const fbKey of token.firebaseKeys) {
-                        const accessData = tokenAccessStatus?.[fbKey]?.[student.id];
-                        const submissionData = submittedExamsCache?.[fbKey]?.[student.id];
+                const accessData = tokenAccessStatus[token.key] && tokenAccessStatus[token.key][student.id];
+                const submissionData = submittedExamsCache[token.key] && submittedExamsCache[token.key][student.id];
 
-                        if (submissionData?.isSubmitted) hasSubmittedAny = true;
-                        if (accessData?.isLoggedIn) isLoggedInForAny = true;
-                        if (accessData?.accessCount > 0) hasAccessedAny = true;
-                    }
-                }
+                if (submissionData?.isSubmitted) hasSubmittedAny = true;
+                if (accessData?.isLoggedIn) isLoggedInForAny = true;
+                if (accessData?.accessCount > 0) hasAccessedAny = true;
             }
 
             if(hasSubmittedAny) { studentStatus = 'Sudah submit'; statusColor = 'green'; }
@@ -1560,8 +1529,6 @@
     // Function to update items per page and re-render tables
     window.updateItemsPerPage = (value) => {
         selectedItemsPerPage = parseInt(value, 10);
-        // Ensure the dropdown reflects the current selection on initial load/section change
-        document.getElementById('itemsPerPageSelect').value = selectedItemsPerPage; 
         window.renderStudentTable(1); // Reset student table to page 1 with new items per page
         window.renderScoreTable(1);   // Reset score table to page 1 with new items per page
     };
@@ -1628,7 +1595,7 @@
         try {
             if (oldDb.app.name !== newDb.app.name) {
                 await remove(ref(oldDb, 'students/' + currentStudentKey));
-                await push(ref(newDb, 'students'), updatedData);
+                await push(ref(newDb, 'students'), updatedStudentData);
                 showNotification(`Siswa berhasil dipindahkan ke kelas ${newStudentClass}!`);
             } else {
                 await update(ref(newDb, 'students/' + currentStudentKey), updatedData);
@@ -1705,51 +1672,33 @@
             textToCopy = header + body;
 
         } else if (currentTableIdToCopy === 'scoreTable') { // Specific copy logic for score table
-            let header = `NO\tNAMA SISWA\tKELAS`;
-            const subjects = new Set();
-            // Collect all subjects from relevant tokens based on current filter
             let studentsForCopy = studentCache;
             if (window.currentScoreGradeFilter !== 'ALL') {
-                studentsForCopy = studentsForCopy.filter(s => getNumericClass(s.class) === window.currentScoreGradeFilter);
+                studentsForCopy = studentCache.filter(s => getNumericClass(s.class) === window.currentScoreGradeFilter);
             }
             
-            // Apply search filters if present for score table
             const scoreSearchName = document.getElementById('scoreSearchName').value.trim().toUpperCase();
             if (scoreSearchName) studentsForCopy = studentsForCopy.filter(student => student.name.toUpperCase().includes(scoreSearchName));
             
             const scoreSearchClass = document.getElementById('scoreSearchClass').value.trim().toUpperCase();
             if (scoreSearchClass) studentsForCopy = studentsForCopy.filter(student => student.class.toUpperCase().includes(scoreSearchClass));
+            
+            const relevantTokens = tokenCache.filter(t => getNumericClass(t.kelas) === window.currentScoreGradeFilter);
+            const subjects = [...new Set(relevantTokens.map(t => t.subject))].sort();
 
-
-            studentsForCopy.forEach(student => {
-                const studentNumericClass = getNumericClass(student.class);
-                tokenCache.filter(token => getNumericClass(token.kelas) === studentNumericClass).forEach(token => {
-                    // Check if token.firebaseKeys is defined and is an array before iterating
-                    if (token.firebaseKeys && Array.isArray(Array.from(token.firebaseKeys))) {
-                        Array.from(token.firebaseKeys).forEach(fbKey => { 
-                            // Check if studentAnswersCache[fbKey] and studentAnswersCache[fbKey][student.id] exist
-                            const answerData = studentAnswersCache?.[fbKey]?.[student.id];
-                            if (answerData) {
-                                 subjects.add(token.subject);
-                            }
-                        });
-                    }
-                });
-            });
-            const sortedSubjects = Array.from(subjects).sort();
-            sortedSubjects.forEach(subject => header += `\t${subject}`);
+            let header = `NO\tNAMA SISWA\tKELAS`;
+            subjects.forEach(subject => header += `\t${generateAbbreviation(subject)}`);
             header += `\n`;
 
             let body = '';
             studentsForCopy.forEach((student, index) => {
                 let rowData = `${index + 1}\t${student.name}\t${student.class}`;
-                sortedSubjects.forEach(subject => {
+                subjects.forEach(subject => {
                     let score = '-';
                     const tokenInfo = Array.from(consolidatedTokensMap.values()).find(t => t.subject === subject && getNumericClass(t.kelas) === getNumericClass(student.class));
                     if(tokenInfo){
                         for(const fbKey of Array.from(tokenInfo.firebaseKeys)){
-                             // Ensure answerData exists before trying to calculate score
-                             const answerData = studentAnswersCache?.[fbKey]?.[student.id];
+                             const answerData = studentAnswersCache[fbKey] && studentAnswersCache[fbKey][student.id];
                              if (answerData) {
                                  score = calculateScore(answerData.answers, tokenInfo.answerKey);
                                  break;
@@ -1824,41 +1773,14 @@
     window.confirmDeleteStudent = async () => {
         if (!deleteStudentKey) return;
         const studentToDelete = studentCache.find(s => s.key === deleteStudentKey);
-        if (!studentToDelete || !studentToDelete.class) { // Add check for studentToDelete.class
-            showNotification("Siswa tidak ditemukan atau data tidak lengkap.");
-            closeDeleteStudentConfirmModal();
-            return;
-        }
+        if (!studentToDelete) return showNotification("Siswa tidak ditemukan.");
         const targetDb = getDbForClass(studentToDelete.class);
-        if (!targetDb || Array.isArray(targetDb)) {
-            showNotification("Gagal menghapus: Instance database tidak ditemukan untuk identifier: " + studentToDelete.class); // More specific error
-            closeDeleteStudentConfirmModal();
-            return;
-        }
+        if (!targetDb || Array.isArray(targetDb)) return showNotification("Gagal menghapus: Database tidak ditemukan.");
 
         loadingOverlay.style.display = 'flex';
         try {
-            // Collect all relevant token keys for this student's class across all related tokens
-            const studentNumericClass = getNumericClass(studentToDelete.class);
-            const relevantTokensForStudent = tokenCache.filter(token => getNumericClass(token.kelas) === studentNumericClass);
-
-            const deletePromises = [
-                remove(ref(targetDb, `students/${deleteStudentKey}`)) // Delete the student node
-            ];
-
-            // For each relevant token, delete access status, submitted exams, and student answers for this student
-            for (const token of relevantTokensForStudent) {
-                if (token.firebaseKeys && Array.isArray(Array.from(token.firebaseKeys))) {
-                    Array.from(token.firebaseKeys).forEach(fbKey => {
-                        deletePromises.push(remove(ref(targetDb, `exam_access_status/${fbKey}/${studentToDelete.id}`)));
-                        deletePromises.push(remove(ref(targetDb, `submitted_exams/${fbKey}/${studentToDelete.id}`)));
-                        deletePromises.push(remove(ref(targetDb, `student_answers/${fbKey}/${studentToDelete.id}`)));
-                    });
-                }
-            }
-
-            await Promise.all(deletePromises);
-            showNotification('Siswa berhasil dihapus beserta data ujiannya!');
+            await remove(ref(targetDb, 'students/' + deleteStudentKey));
+            showNotification('Siswa berhasil dihapus.');
         } catch (error) {
             showNotification("Gagal menghapus siswa: " + error.message);
         } finally {
@@ -2076,90 +1998,117 @@
         if (examStatusFilterDropdown.value) window.renderStudentTable(1);
     }
     
+    // --- NEW AND MODIFIED SCORE FUNCTIONS ---
+
+    // New helper function for subject abbreviation
+    function generateAbbreviation(subjectName) {
+        if (!subjectName) return 'N/A';
+        const upperSubject = subjectName.toUpperCase();
+        const words = upperSubject.split(' ').filter(word => word !== 'DAN' && word !== 'DAN,');
+
+        if (words.length >= 3) { // Pendidikan Agama Islam -> PAI
+            return words.map(w => w[0]).join('');
+        }
+        if (words.length === 2) { // Bahasa Indonesia -> BIND
+            return words[0][0] + words[1].substring(0, 3);
+        }
+        if (words.length === 1) { // INFORMATIKA -> INFO
+            return words[0].substring(0, 4);
+        }
+        // Fallback for any other case
+        return upperSubject.substring(0, 4);
+    }
+
+    // New function to reset the score table view to its default state
+    function resetScoreTable() {
+        scoreTableHeader.innerHTML = '';
+        scoreTableBody.innerHTML = '';
+        scorePaginationDiv.innerHTML = '';
+        scoreTableMessage.style.display = 'block'; // Show the prompt message
+        document.getElementById('scoreTable').style.display = 'none'; // Hide the table structure
+    }
+
+    // MODIFIED renderScoreTable function
     window.renderScoreTable = (page = 1) => { // Made global
         currentPageScore = page;
-        scoreTableHeader.innerHTML = '<th>NO</th><th>NAMA SISWA</th><th>KELAS</th>';
-        scoreTableBody.innerHTML = '';
-        const subjects = new Set();
-        let studentsToDisplay = studentCache; // Start with all students
-        
-        // Filter students by grade if currentScoreGradeFilter is set
-        if (window.currentScoreGradeFilter !== 'ALL') {
-            studentsToDisplay = studentsToDisplay.filter(student => student.class && getNumericClass(student.class) === window.currentScoreGradeFilter);
+
+        // Guard clause: if no grade is selected, do nothing. The view is handled by resetScoreTable.
+        if (window.currentScoreGradeFilter === 'ALL') {
+            resetScoreTable();
+            return;
         }
 
-        // Apply search filters if present for score table (on the filtered students)
+        scoreTableMessage.style.display = 'none'; // Hide the prompt
+        document.getElementById('scoreTable').style.display = 'table'; // Show the table
+
+        let studentsToDisplay = studentCache.filter(student => getNumericClass(student.class) === window.currentScoreGradeFilter);
+        
+        // Apply search filters
         const scoreSearchName = document.getElementById('scoreSearchName').value.trim().toUpperCase();
         if (scoreSearchName) {
-            studentsToDisplay = studentsToDisplay.filter(student => student.name && student.name.toUpperCase().includes(scoreSearchName));
+            studentsToDisplay = studentsToDisplay.filter(student => student.name.toUpperCase().includes(scoreSearchName));
         }
-        
         const scoreSearchClass = document.getElementById('scoreSearchClass').value.trim().toUpperCase();
         if (scoreSearchClass) {
-            studentsToDisplay = studentsToDisplay.filter(student => student.class && student.class.toUpperCase().includes(scoreSearchClass));
+            studentsToDisplay = studentsToDisplay.filter(student => student.class.toUpperCase().includes(scoreSearchClass));
         }
 
-        // Now, collect subjects based on the *filtered* students and their available answers
-        studentsToDisplay.forEach(student => {
-            const studentNumericClass = getNumericClass(student.class);
-            // Filter tokens relevant to the student's class, then check their answers
-            tokenCache.filter(token => token.kelas && getNumericClass(token.kelas) === studentNumericClass).forEach(token => {
-                // Check if token.firebaseKeys is defined and is an array before iterating
-                if (token.firebaseKeys && token.firebaseKeys instanceof Set) { 
-                    Array.from(token.firebaseKeys).forEach(fbKey => { 
-                        // Check if studentAnswersCache[fbKey] and studentAnswersCache[fbKey][student.id] exist
-                        const answerData = studentAnswersCache?.[fbKey]?.[student.id];
-                        if (answerData) {
-                             subjects.add(token.subject);
-                        }
-                    });
-                }
-            });
+        // --- Dynamic Header Generation ---
+        const relevantTokens = tokenCache.filter(t => getNumericClass(t.kelas) === window.currentScoreGradeFilter);
+        const subjects = [...new Set(relevantTokens.map(t => t.subject))].sort();
+        
+        const theadContent = document.createElement('tr');
+        theadContent.innerHTML = '<th>NO</th><th>NAMA SISWA</th><th>KELAS</th>';
+        subjects.forEach(subject => {
+            theadContent.innerHTML += `<th>${generateAbbreviation(subject)}</th>`;
         });
+        scoreTableHeader.innerHTML = '';
+        scoreTableHeader.appendChild(theadContent);
         
-        const sortedSubjects = Array.from(subjects).sort();
-        sortedSubjects.forEach(subject => scoreTableHeader.innerHTML += `<th>${subject.substring(0, 5)}</th>`);
-        
-        filteredScores = studentsToDisplay; // Store filtered results for pagination
+        // --- Table Body Generation ---
+        filteredScores = studentsToDisplay;
         const totalPages = Math.ceil(filteredScores.length / selectedItemsPerPage);
-        // Adjust current page if it's now out of bounds after filtering
-        if (currentPageScore > totalPages && totalPages > 0) {
-            currentPageScore = totalPages;
-        } else if (totalPages === 0) {
-            currentPageScore = 1; // No pages, show first page
-        }
         const startIndex = (currentPageScore - 1) * selectedItemsPerPage;
         const endIndex = startIndex + selectedItemsPerPage;
         const scoresForPage = filteredScores.slice(startIndex, endIndex);
 
+        scoreTableBody.innerHTML = ''; // Clear previous body
         scoresForPage.forEach((student, index) => {
             const row = document.createElement('tr');
-            row.innerHTML = `<td>${startIndex + index + 1}</td><td>${student.name}</td><td>${student.class}</td>`;
-            sortedSubjects.forEach(subject => {
+            let rowContent = `<td>${startIndex + index + 1}</td>
+                              <td>${escapeHtmlAttributeForJsString(student.name)}</td>
+                              <td>${escapeHtmlAttributeForJsString(student.class)}</td>`;
+            
+            subjects.forEach(subject => {
                 let score = '-';
                 const tokenInfo = Array.from(consolidatedTokensMap.values()).find(t => t.subject === subject && getNumericClass(t.kelas) === getNumericClass(student.class));
-                if(tokenInfo){
-                    for(const fbKey of tokenInfo.firebaseKeys){
-                             // Ensure answerData exists before trying to calculate score
-                             const answerData = studentAnswersCache?.[fbKey]?.[student.id];
-                             if (answerData) {
-                                 score = calculateScore(answerData.answers, tokenInfo.answerKey);
-                                 break;
-                             }
-                        }
+                if (tokenInfo) {
+                    for (const fbKey of Array.from(tokenInfo.firebaseKeys)) {
+                         const answerData = studentAnswersCache[fbKey] && studentAnswersCache[fbKey][student.id];
+                         if (answerData) {
+                             score = calculateScore(answerData.answers, tokenInfo.answerKey);
+                             break; // Found score, no need to check other keys for the same consolidated token
+                         }
                     }
-                row.innerHTML += `<td>${score}</td>`;
+                }
+                rowContent += `<td>${score}</td>`;
             });
+
+            row.innerHTML = rowContent;
             scoreTableBody.appendChild(row);
         });
+        
         renderPaginationControls(scorePaginationDiv, currentPageScore, totalPages, 'renderScoreTable');
-    }; // End window.renderScoreTable
-
+    }; 
+    
     function calculateScore(studentAnswersString, answerKeyString) {
         if (!answerKeyString || !studentAnswersString) return 0;
-        const correctAnswers = answerKeyString.split(','), studentAnswers = studentAnswersString.split(',');
+        const correctAnswers = answerKeyString.split(',').filter(k => k.trim() !== '');
+        const studentAnswers = studentAnswersString.split(',');
         const totalQuestions = correctAnswers.length;
+
         if (totalQuestions === 0) return 0;
+
         let correctCount = 0;
         for (let i = 0; i < totalQuestions; i++) {
             if (i < studentAnswers.length && studentAnswers[i] && correctAnswers[i] && studentAnswers[i].trim().toUpperCase() === correctAnswers[i].trim().toUpperCase()) {
@@ -2168,6 +2117,8 @@
         }
         return parseFloat(((correctCount / totalQuestions) * 100).toFixed(2));
     }
+    // --- END OF NEW/MODIFIED SCORE FUNCTIONS ---
+
 
     window.promptResetStudent = (key, id, name, studentClass) => {
         studentKeyForAction = key; studentIdForAction = id; studentNameForAction = name; studentClassForAction = studentClass;
@@ -2194,10 +2145,10 @@
             const updates = {};
             updates[`students/${studentKeyForAction}/isLoggedIn`] = false;
             
-            const relevantTokens = tokenCache.filter(token => token.kelas && getNumericClass(token.kelas) === getNumericClass(studentClassForAction) && token.firebaseGroup === targetDb.app.name);
+            const relevantTokens = tokenCache.filter(token => getNumericClass(token.kelas) === getNumericClass(studentClassForAction) && token.firebaseGroup === targetDb.app.name);
             for (const token of relevantTokens) {
                 // Set isLoggedIn to null to remove the entry, not just false, for a clean reset state
-                updates[`exam_access_status/${token.key}/${studentIdForAction}/isLoggedIn`] = false; // Set to false, not null, for consistent state
+                updates[`exam_access_status/${token.key}/${studentIdForAction}/isLoggedIn`] = null; 
             }
             await update(ref(targetDb, '/'), updates);
             showNotification(`Status login siswa ${studentIdForAction} berhasil direset.`);
@@ -2223,7 +2174,7 @@
         loadingOverlay.style.display = 'flex';
         try {
             const updates = {};
-            const relevantTokens = tokenCache.filter(token => token.kelas && getNumericClass(token.kelas) === getNumericClass(studentClassForAction) && token.firebaseGroup === targetDb.app.name);
+            const relevantTokens = tokenCache.filter(token => getNumericClass(token.kelas) === getNumericClass(studentClassForAction) && token.firebaseGroup === targetDb.app.name);
             for (const token of relevantTokens) {
                  updates[`submitted_exams/${token.key}/${studentIdForAction}/isSubmitted`] = true;
                  updates[`submitted_exams/${token.key}/${studentIdForAction}/timestamp`] = Date.now();
@@ -2262,7 +2213,7 @@
         loadingOverlay.style.display = 'flex';
         try {
             const updates = {};
-            const relevantTokens = tokenCache.filter(token => token.kelas && getNumericClass(token.kelas) === getNumericClass(studentClassForAction) && token.firebaseGroup === targetDb.app.name);
+            const relevantTokens = tokenCache.filter(token => getNumericClass(token.kelas) === getNumericClass(studentClassForAction) && token.firebaseGroup === targetDb.app.name);
             for (const token of relevantTokens) {
                 updates[`submitted_exams/${token.key}/${studentIdForAction}`] = null;
                 updates[`student_answers/${token.key}/${studentIdForAction}`] = null;
@@ -2331,8 +2282,8 @@
             onValue(ref(dbInstances[dbName], 'submitted_exams'), (snapshot) => {
                 Object.assign(submittedExamsCache, snapshot.val() || {});
                 renderTokenTable();
-                window.renderStudentTable(currentPageStudent); // Re-render with current page after data update
-                window.renderScoreTable(currentPageScore); // Re-render with current page after data update
+                window.renderStudentTable(currentPageStudent);
+                if (window.currentScoreGradeFilter !== 'ALL') { window.renderScoreTable(currentPageScore); }
             });
         });
     }
@@ -2342,7 +2293,7 @@
         Object.keys(dbInstances).forEach(dbName => {
             onValue(ref(dbInstances[dbName], 'student_answers'), (snapshot) => {
                 Object.assign(studentAnswersCache, snapshot.val() || {});
-                window.renderScoreTable(currentPageScore); // Re-render with current page after data update
+                 if (window.currentScoreGradeFilter !== 'ALL') { window.renderScoreTable(currentPageScore); }
             });
         });
     }
